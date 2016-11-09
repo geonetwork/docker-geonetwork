@@ -35,10 +35,10 @@ dirCommit() {
 }
 
 cat <<-EOH
-# this file is generated via https://github.com/GeoCat/geonetwork-official-images/blob/$(fileCommit "$self")/$self
+# this file is generated via https://github.com/geonetwork/docker-geonetwork/blob/$(fileCommit "$self")/$self
 
 Maintainers: Joana Simoes <joana.simoes@geocat.net> (@doublebyte1)
-GitRepo: https://github.com/geocat/geonetwork-official-images
+GitRepo: https://github.com/geonetwork/docker-geonetwork
 EOH
 
 # prints "$2$1$3$1...$N"
