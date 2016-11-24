@@ -58,17 +58,17 @@ else
 fi
 
 #Write connection string for GN
-echo "jdbc.username=$POSTGRES_DB_USERNAME" >> "$BASE_DIR"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
-echo "jdbc.password=$POSTGRES_DB_PASSWORD" >> "$BASE_DIR"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
-echo "jdbc.database=geonetwork" >> "$BASE_DIR"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
-echo "jdbc.host=$db_host" >> "$BASE_DIR"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
-echo "jdbc.port=$db_port" >> "$BASE_DIR"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
+echo "jdbc.username=$POSTGRES_DB_USERNAME" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
+echo "jdbc.password=$POSTGRES_DB_PASSWORD" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
+echo "jdbc.database=geonetwork" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
+echo "jdbc.host=$db_host" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
+echo "jdbc.port=$db_port" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
 
 #Fixing an hardcoded port on the connection string (bug fixed on development branch)
-sed -i -e 's#5432#${jdbc.port}#g' $BASE_DIR/webapps/geonetwork/WEB-INF/config-db/postgres.xml
+sed -i -e 's#5432#${jdbc.port}#g' $CATALINA_HOME/webapps/geonetwork/WEB-INF/config-db/postgres.xml
 
 rm ~/.pgpass
 
-"$BASE_DIR"/bin/catalina.sh run
+"$CATALINA_HOME"/bin/catalina.sh run
 
 exec "$@"
