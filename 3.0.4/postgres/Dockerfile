@@ -1,6 +1,7 @@
 FROM geonetwork:3.0.4
 
-RUN apt-get update && apt-get install -y postgresql-client
+RUN apt-get update && apt-get install -y postgresql-client && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 #Set PostgreSQL as default GN DB
 RUN sed -i -e 's#<import resource="../config-db/h2.xml"/>#<!--<import resource="../config-db/h2.xml"/> -->#g' $BASE_DIR/webapps/geonetwork/WEB-INF/config-node/srv.xml
