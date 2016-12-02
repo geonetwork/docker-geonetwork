@@ -1,74 +1,51 @@
 #!/bin/bash
 set -e
 
-mkdir -p "$DATA_DIR"
+if [ "$1" = 'catalina.sh' ]; then
 
-#Set geonetwork data dir
-sed -i '$d' /usr/local/tomcat/bin/setclasspath.sh
-echo "CATALINA_OPTS=\"\$CATALINA_OPTS -Dgeonetwork.dir=$DATA_DIR\"" >> /usr/local/tomcat/bin/setclasspath.sh
-echo "fi" >> /usr/local/tomcat/bin/setclasspath.sh
+	mkdir -p "$DATA_DIR"
 
-#Setting host
-db_host=""
-if grep -F "postgres" /etc/hosts
-	then
-	 echo "Found db container linked"
-	 db_host="postgres"
-else
-	if [ -z "$POSTGRES_DB_HOST" ]; then
-		echo "Found no db container linked. You must set POSTGRES_DB_HOST, if you want to connect to a remote DB"
-		exit
-	else
-		db_host="$POSTGRES_DB_HOST"
+	#Set geonetwork data dir
+	export CATALINA_OPTS="$CATALINA_OPTS -Dgeonetwork.dir=$DATA_DIR"
+
+	#Setting host (use $POSTGRES_DB_HOST if it's set, otherwise use "postgres")
+	db_host="${POSTGRES_DB_HOST:-postgres}"
+	echo "db host: $db_host"
+
+	#Setting port
+	db_port="${POSTGRES_DB_PORT:-5432}"
+	echo "db port: $db_port"
+
+	if [ -z "$POSTGRES_DB_USERNAME" ] || [ -z "$POSTGRES_DB_PASSWORD" ]; then
+		echo >&2 "you must set POSTGRES_DB_USERNAME and POSTGRES_DB_PASSWORD"
+		exit 1
 	fi
+
+	db_admin="admin"
+	db_gn="geonetwork"
+
+	#Create databases, if they do not exist yet (http://stackoverflow.com/a/36591842/433558)
+	echo  "$db_host:$db_port:*:$POSTGRES_DB_USERNAME:$POSTGRES_DB_PASSWORD" > ~/.pgpass
+	chmod 0600 ~/.pgpass
+	for db_name in "$db_admin" "$db_gn"; do
+		if psql -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -tqc "SELECT 1 FROM pg_database WHERE datname = '$db_name'" | grep -q 1; then
+			echo "database '$db_name' exists; skipping createdb"
+		else
+			createdb -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -O "$POSTGRES_DB_USERNAME" "$db_name"
+		fi
+	done
+	rm ~/.pgpass
+
+	#Write connection string for GN
+	sed -ri '/^jdbc[.](username|password|database|host|port)=/d' "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
+	echo "jdbc.username=$POSTGRES_DB_USERNAME" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
+	echo "jdbc.password=$POSTGRES_DB_PASSWORD" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
+	echo "jdbc.database=$db_gn" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
+	echo "jdbc.host=$db_host" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
+	echo "jdbc.port=$db_port" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
+
+	#Fixing an hardcoded port on the connection string (bug fixed on development branch)
+	sed -i -e 's#5432#${jdbc.port}#g' $CATALINA_HOME/webapps/geonetwork/WEB-INF/config-db/postgres.xml
 fi
-
-echo "db host:" $db_host
-
-#Setting port
-if [ -z "$POSTGRES_DB_PORT" ]; then
-	db_port=5432
-else
-	db_port="$POSTGRES_DB_PORT"
-fi
-echo "db port:" $db_port
-
-if [ -z "$POSTGRES_DB_USERNAME" ] || [ -z "$POSTGRES_DB_PASSWORD" ]; then
-	echo "you must set POSTGRES_DB_USERNAME and POSTGRES_DB_PASSWORD"
-	exit
-fi
-
-echo  "$db_host:$db_port:*:$POSTGRES_DB_USERNAME:$POSTGRES_DB_PASSWORD" > ~/.pgpass
-chmod 0600 ~/.pgpass
-
-db_admin="admin"
-db_gn="geonetwork"
-
-#Create databases, if they do not exist yet
-if psql -h $db_host -U "$POSTGRES_DB_USERNAME" -p $db_port -lqt | cut -d \| -f 1 | grep -qw $db_gn; then
-	echo "database $db_gn exists; do nothing"
-else
-	createdb -h $db_host -U "$POSTGRES_DB_USERNAME" -p $db_port -O "$POSTGRES_DB_USERNAME" $db_gn
-fi
-
-if psql -h $db_host -U "$POSTGRES_DB_USERNAME" -p $db_port -lqt | cut -d \| -f 1 | grep -qw $db_admin; then
-	echo "database $db_admin exists; do nothing"
-else
-	createdb -h $db_host -U "$POSTGRES_DB_USERNAME" -p $db_port -O "$POSTGRES_DB_USERNAME" $db_admin
-fi
-
-#Write connection string for GN
-echo "jdbc.username=$POSTGRES_DB_USERNAME" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
-echo "jdbc.password=$POSTGRES_DB_PASSWORD" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
-echo "jdbc.database=geonetwork" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
-echo "jdbc.host=$db_host" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
-echo "jdbc.port=$db_port" >> "$CATALINA_HOME"/webapps/geonetwork/WEB-INF/config-db/jdbc.properties
-
-#Fixing an hardcoded port on the connection string (bug fixed on development branch)
-sed -i -e 's#5432#${jdbc.port}#g' $CATALINA_HOME/webapps/geonetwork/WEB-INF/config-db/postgres.xml
-
-rm ~/.pgpass
-
-"$CATALINA_HOME"/bin/catalina.sh run
 
 exec "$@"
