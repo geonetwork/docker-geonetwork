@@ -6,6 +6,9 @@ declare -A aliases=(
         [3.2.1]='3.2 latest'
 )
 
+# builds to exclude from tagging
+dirExclude=(3.2.0)
+
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
@@ -49,6 +52,8 @@ join() {
 }
 
 for version in "${versions[@]}"; do
+  if ! (echo ${dirExclude[@]} | grep -w $version > /dev/null) ; then
+
 	commit="$(dirCommit "$version")"
 
 	fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '$1 == "ENV" && $2 == "GN_VERSION" { print $3; exit }')"
@@ -80,4 +85,5 @@ for version in "${versions[@]}"; do
 			Directory: $version/$variant
 		EOE
 	done
+  fi
 done
