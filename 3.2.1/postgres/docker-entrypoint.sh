@@ -21,8 +21,12 @@ if [ "$1" = 'catalina.sh' ]; then
 		exit 1
 	fi
 
-	db_admin="admin"
-	db_gn="geonetwork"
+	db_gn="$POSTGRES_DB"
+
+	#Setting database name, otherwise use "geonetwork" as default
+	if [ -z "$POSTGRES_DB" ]; then
+		db_gn="geonetwork"
+	fi
 
 	#Create databases, if they do not exist yet (http://stackoverflow.com/a/36591842/433558)
 	echo  "$db_host:$db_port:*:$POSTGRES_DB_USERNAME:$POSTGRES_DB_PASSWORD" > ~/.pgpass
