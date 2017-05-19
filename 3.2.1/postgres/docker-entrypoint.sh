@@ -21,17 +21,17 @@ if [ "$1" = 'catalina.sh' ]; then
 		exit 1
 	fi
 
-	db_gn="$POSTGRES_DB"
+	# db_admin="admin"
 
 	#Setting database name, otherwise use "geonetwork" as default
-	if [ -z "$POSTGRES_DB" ]; then
+	if [ -z "$db_gn" ]; then
 		db_gn="geonetwork"
 	fi
 
 	#Create databases, if they do not exist yet (http://stackoverflow.com/a/36591842/433558)
 	echo  "$db_host:$db_port:*:$POSTGRES_DB_USERNAME:$POSTGRES_DB_PASSWORD" > ~/.pgpass
 	chmod 0600 ~/.pgpass
-	for db_name in "$db_admin" "$db_gn"; do
+	for db_name in "$db_gn"; do
 		if psql -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -tqc "SELECT 1 FROM pg_database WHERE datname = '$db_name'" | grep -q 1; then
 			echo "database '$db_name' exists; skipping createdb"
 		else
