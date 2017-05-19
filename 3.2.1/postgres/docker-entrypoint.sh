@@ -21,8 +21,6 @@ if [ "$1" = 'catalina.sh' ]; then
 		exit 1
 	fi
 
-	# db_admin="admin"
-
 	#Setting database name, otherwise use "geonetwork" as default
 	if [ -z "$db_gn" ]; then
 		db_gn="geonetwork"
