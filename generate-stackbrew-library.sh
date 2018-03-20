@@ -77,7 +77,7 @@ for version in "${versions[@]}"; do
 		commit="$(dirCommit "$version/$variant")"
 
 		variantAliases=( "${versionAliases[@]/%/-$variant}" )
-		#variantAliases=( "${variantAliases[@]//latest-/}" )
+		variantAliases=( "${variantAliases[@]//latest-/}" )
 
 		echo
 		cat <<-EOE
