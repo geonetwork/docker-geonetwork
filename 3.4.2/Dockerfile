@@ -6,7 +6,7 @@ ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true 
 
 #Environment variables
 ENV GN_VERSION 3.4.2
-ENV GN_DOWNLOAD_MD5 f7d274a5f49d5f0968b204d290308943
+ENV GN_DOWNLOAD_MD5 e0ff34ab3995b3a8107f3c3c78f7294a
 
 WORKDIR $CATALINA_HOME/webapps
 
