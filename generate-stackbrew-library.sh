@@ -4,11 +4,11 @@ set -eu
 declare -A aliases=(
         [3.0.5]='3.0'
         [3.2.2]='3.2'
-        [3.4.1]='3.4 latest'
+        [3.4.2]='3.4 latest'
 )
 
 # builds to exclude from tagging
-dirExclude=([3.2.0],[3.2.1],[3.4.0])
+dirExclude=([3.2.0],[3.2.1],[3.4.0],[3.4.1])
 
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
