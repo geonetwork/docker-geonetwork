@@ -41,7 +41,7 @@ dirCommit() {
 cat <<-EOH
 # this file is generated via https://github.com/geonetwork/docker-geonetwork/blob/$(fileCommit "$self")/$self
 
-Maintainers: Joana Simoes <joana.simoes@geocat.net> (@doublebyte1)
+Maintainers: Joana Simoes <jo@doublebyte.net> (@doublebyte1)
 GitRepo: https://github.com/geonetwork/docker-geonetwork
 EOH
 
