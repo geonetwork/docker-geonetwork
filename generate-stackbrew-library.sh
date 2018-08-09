@@ -8,7 +8,7 @@ declare -A aliases=(
 )
 
 # builds to exclude from tagging
-dirExclude=([3.2.0],[3.2.1],[3.4.0],[3.4.1],[3.4.2])
+dirExclude=([3.0.5],[3.2.0],[3.2.1],[3.4.0],[3.4.1],[3.4.2])
 
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink "$BASH_SOURCE")")"
