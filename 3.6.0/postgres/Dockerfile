@@ -11,7 +11,6 @@ COPY ./jdbc.properties $CATALINA_HOME/webapps/geonetwork/WEB-INF/config-db/jdbc.
 
 #Initializing database & connection string for GN
 COPY ./docker-entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["catalina.sh", "run"]
