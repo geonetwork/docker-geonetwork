@@ -16,6 +16,7 @@ ENV MAVEN_OPTS ${MAVEN_OPTS}
 WORKDIR /opt/
 RUN git clone ${GIT_CLONE} core-geonetwork
 WORKDIR /opt/core-geonetwork/
+# RUN git checkout -b lele a650e81 && git reset --hard && git log -n 2
 RUN sed -i -e 's|slave.masterURL=https://..../geonetwork|slave.masterURL=http://geonetworkmaster:8080/geonetwork|' ./slave/src/main/resources/slave.properties
 # Use cached Maven stuff, if you have:
 WORKDIR /root/.m2/

@@ -51,7 +51,7 @@ services:
       - POSTGRES_DB_USERNAME=geonetwork
       - POSTGRES_DB_PASSWORD=********
       - POSTGRES_DB_HOST=dbmaster
-    image: obr2pd/geonetworkmaster:5c600fc
+    image: obr2pd/geonetworkmaster:a650e81
     logging:
       driver: "json-file" 
       options:
@@ -83,7 +83,7 @@ services:
       - POSTGRES_DB_USERNAME=geonetwork
       - POSTGRES_DB_PASSWORD=********
       - POSTGRES_DB_HOST=dbslave
-    image: obr2pd/geonetworkslave:5c600fc
+    image: obr2pd/geonetworkslave:a650e81
     logging:
       driver: "json-file" 
       options:
