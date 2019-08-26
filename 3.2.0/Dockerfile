@@ -1,8 +1,8 @@
-FROM tomcat:8.0-jre8
+FROM tomcat:8.5-jdk8
 
 ENV GN_FILE geonetwork.war
 ENV DATA_DIR=$CATALINA_HOME/webapps/geonetwork/WEB-INF/data
-ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true -Xmx512M -Xss2M -XX:+UseConcMarkSweepGC"
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true -Xmx1024M -Xss2M -XX:+UseConcMarkSweepGC"
 
 #Environment variables
 ENV GN_VERSION 3.2.0
