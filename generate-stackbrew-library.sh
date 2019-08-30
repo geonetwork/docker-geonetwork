@@ -47,7 +47,7 @@ cat <<-EOH
 Maintainers: Joana Simoes <jo@doublebyte.net> (@doublebyte1),
 	     Juan Luis Rodriguez <juanluisrp@geocat.net> (@juanluisrp)
 GitRepo: https://github.com/geonetwork/docker-geonetwork
-Architectures: amd64, arm32v5, arm32v7, arm64v8, i386, ppc64le, s390x
+Architectures: amd64
 EOH
 
 # prints "$2$1$3$1...$N"
