@@ -28,7 +28,7 @@ if [ "$1" = 'catalina.sh' ]; then
 	echo  "$db_host:$db_port:*:$POSTGRES_DB_USERNAME:$POSTGRES_DB_PASSWORD" > ~/.pgpass
 	chmod 0600 ~/.pgpass
 	for db_name in "$db_admin" "$db_gn"; do
-		if psql -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -tqc "SELECT 1 FROM pg_database WHERE datname = '$db_name'" | grep -q 1; then
+		if psql -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -tqc "SELECT 1 FROM pg_database WHERE datname = '$db_name'" postgres | grep -q 1; then
 			echo "database '$db_name' exists; skipping createdb"
 		else
 			createdb -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -O "$POSTGRES_DB_USERNAME" "$db_name"
