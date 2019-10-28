@@ -26,11 +26,11 @@ if [ "$1" = 'catalina.sh' ]; then
 	#Create databases, if they do not exist yet (http://stackoverflow.com/a/36591842/433558)
 	echo  "$db_host:$db_port:*:$POSTGRES_DB_USERNAME:$POSTGRES_DB_PASSWORD" > ~/.pgpass
 	chmod 0600 ~/.pgpass
-    if psql -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -tqc "SELECT 1 FROM pg_database WHERE datname = '$db_gn'" | grep -q 1; then
-        echo "database '$db_gn' exists; skipping createdb"
-    else
-        createdb -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -O "$POSTGRES_DB_USERNAME" "$db_gn"
-    fi
+        if psql -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -tqc "SELECT 1 FROM pg_database WHERE datname = '$db_gn'" | grep -q 1; then
+            echo "database '$db_gn' exists; skipping createdb"
+        else
+            createdb -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -O "$POSTGRES_DB_USERNAME" "$db_gn"
+        fi
 	rm ~/.pgpass
 
 	#Write connection string for GN
