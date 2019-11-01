@@ -3,7 +3,11 @@ set -e
 
 if [ "$1" = 'catalina.sh' ]; then
 
-	mkdir -p "$DATA_DIR"
+	
+	if [ ! -d "$DATA_DIR" ]; then
+    	echo "$Data directory '$DATA_DIR' does not exist. Creating it..."
+		mkdir -p "$DATA_DIR"
+	fi
 
 	#Set geonetwork data dir
 	export CATALINA_OPTS="$CATALINA_OPTS -Dgeonetwork.dir=$DATA_DIR"
@@ -21,19 +25,19 @@ if [ "$1" = 'catalina.sh' ]; then
 		exit 1
 	fi
 
-	db_admin="admin"
-	db_gn="geonetwork"
+	db_gn="${POSTGRES_DB_NAME:-geonetwork}"
 
 	#Create databases, if they do not exist yet (http://stackoverflow.com/a/36591842/433558)
 	echo  "$db_host:$db_port:*:$POSTGRES_DB_USERNAME:$POSTGRES_DB_PASSWORD" > ~/.pgpass
 	chmod 0600 ~/.pgpass
-	for db_name in "$db_admin" "$db_gn"; do
-		if psql -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -tqc "SELECT 1 FROM pg_database WHERE datname = '$db_name'" | grep -q 1; then
-			echo "database '$db_name' exists; skipping createdb"
-		else
-			createdb -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -O "$POSTGRES_DB_USERNAME" "$db_name"
-		fi
-	done
+	if psql -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -tqc "SELECT 1 FROM pg_database WHERE datname = '$db_gn'" | grep -q 1; then
+		echo "Database '$db_gn' exists; skipping createdb"
+	elif psql -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -d "$db_gn" -tqc "SELECT 1 FROM pg_database WHERE datname = '$db_gn'" | grep -q 1;then
+		echo "Database '$db_gn' already exist; skipping database creation"
+	else
+		echo "Database '$db_gn' doesn't exist. Creating it..."
+		createdb -h "$db_host" -U "$POSTGRES_DB_USERNAME" -p "$db_port" -O "$POSTGRES_DB_USERNAME" "$db_gn"
+	fi
 	rm ~/.pgpass
 
 	#Write connection string for GN
