@@ -41,13 +41,28 @@ dirCommit() {
 	)
 }
 
+getArches() {
+	local repo="$1"; shift
+	local officialImagesUrl='https://github.com/docker-library/official-images/raw/master/library/'
+
+	eval "declare -g -A parentRepoToArches=( $(
+		find -name 'Dockerfile' -exec awk '
+				toupper($1) == "FROM" && $2 !~ /^('"$repo"'|scratch|.*\/.*)(:|$)/ {
+					print "'"$officialImagesUrl"'" $2
+				}
+			' '{}' + \
+			| sort -u \
+			| xargs bashbrew cat --format '[{{ .RepoName }}:{{ .TagName }}]="{{ join " " .TagEntry.Architectures }}"'
+	) )"
+}
+getArches 'geonetwork'
+
 cat <<-EOH
 # this file is generated via https://github.com/geonetwork/docker-geonetwork/blob/$(fileCommit "$self")/$self
 
 Maintainers: Joana Simoes <jo@doublebyte.net> (@doublebyte1),
 	     Juan Luis Rodriguez <juanluisrp@geocat.net> (@juanluisrp)
 GitRepo: https://github.com/geonetwork/docker-geonetwork
-Architectures: amd64
 EOH
 
 # prints "$2$1$3$1...$N"
@@ -61,6 +76,7 @@ for version in "${versions[@]}"; do
   if ! (echo ${dirExclude[@]} | grep -w $version > /dev/null) ; then
 
 	commit="$(dirCommit "$version")"
+	dir="$version"
 
 	fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '$1 == "ENV" && $2 == "GN_VERSION" { print $3; exit }')"
 
@@ -69,7 +85,11 @@ for version in "${versions[@]}"; do
 		${aliases[$version]:-}
 	)
 
-	echo
+	variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
+	[ -n "$variantParent" ]
+	variantArches="${parentRepoToArches[$variantParent]}"
+
+
 	cat <<-EOE
 		Tags: $(join ', ' "${versionAliases[@]}")
 		GitCommit: $commit
@@ -78,15 +98,22 @@ for version in "${versions[@]}"; do
 
 	for variant in postgres; do
 		[ -f "$version/$variant/Dockerfile" ] || continue
+		dir="$version/$variant"
+
 
 		commit="$(dirCommit "$version/$variant")"
 
 		variantAliases=( "${versionAliases[@]/%/-$variant}" )
 		variantAliases=( "${variantAliases[@]//latest-/}" )
 
+		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
+		[ -n "$variantParent" ]
+		variantArches="${parentRepoToArches[$variantParent]}"
+
 		echo
 		cat <<-EOE
 			Tags: $(join ', ' "${variantAliases[@]}")
+			Architectures: $(join ', ' $variantArches)
 			GitCommit: $commit
 			Directory: $version/$variant
 		EOE
