@@ -5,7 +5,7 @@ if [ "$1" = 'catalina.sh' ]; then
 
 	
 	if [ ! -d "$DATA_DIR" ]; then
-    	echo "$Data directory '$DATA_DIR' does not exist. Creating it..."
+		echo "$Data directory '$DATA_DIR' does not exist. Creating it..."
 		mkdir -p "$DATA_DIR"
 	fi
 
