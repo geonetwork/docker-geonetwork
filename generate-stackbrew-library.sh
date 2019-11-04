@@ -41,6 +41,13 @@ dirCommit() {
 	)
 }
 
+# prints "$2$1$3$1...$N"
+join() {
+	local sep="$1"; shift
+	local out; printf -v out "${sep//%/%%}%s" "$@"
+	echo "${out#$sep}"
+}
+
 getArches() {
 	local repo="$1"; shift
 	local officialImagesUrl='https://github.com/docker-library/official-images/raw/master/library/'
@@ -65,12 +72,6 @@ Maintainers: Joana Simoes <jo@doublebyte.net> (@doublebyte1),
 GitRepo: https://github.com/geonetwork/docker-geonetwork
 EOH
 
-# prints "$2$1$3$1...$N"
-join() {
-	local sep="$1"; shift
-	local out; printf -v out "${sep//%/%%}%s" "$@"
-	echo "${out#$sep}"
-}
 
 for version in "${versions[@]}"; do
   if ! (echo ${dirExclude[@]} | grep -w $version > /dev/null) ; then
@@ -88,27 +89,26 @@ for version in "${versions[@]}"; do
 	variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
 	[ -n "$variantParent" ]
 	variantArches="${parentRepoToArches[$variantParent]}"
-
-
+	
+	echo
 	cat <<-EOE
 		Tags: $(join ', ' "${versionAliases[@]}")
+		Architectures: $(join ', ' $variantArches)
 		GitCommit: $commit
 		Directory: $version
 	EOE
+	constraints="$(bashbrew cat --format '{{ .TagEntry.Constraints | join ", " }}' "https://github.com/docker-library/official-images/raw/master/library/$variantParent")"
+			[ -z "$constraints" ] || echo "Constraints: $constraints"
 
 	for variant in postgres; do
 		[ -f "$version/$variant/Dockerfile" ] || continue
-		dir="$version/$variant"
-
 
 		commit="$(dirCommit "$version/$variant")"
 
 		variantAliases=( "${versionAliases[@]/%/-$variant}" )
 		variantAliases=( "${variantAliases[@]//latest-/}" )
-
 		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
 		[ -n "$variantParent" ]
-		variantArches="${parentRepoToArches[$variantParent]}"
 
 		echo
 		cat <<-EOE
@@ -117,6 +117,9 @@ for version in "${versions[@]}"; do
 			GitCommit: $commit
 			Directory: $version/$variant
 		EOE
+
+		constraints="$(bashbrew cat --format '{{ .TagEntry.Constraints | join ", " }}' "https://github.com/docker-library/official-images/raw/master/library/$variantParent")"
+			[ -z "$constraints" ] || echo "Constraints: $constraints"
 	done
   fi
 done
