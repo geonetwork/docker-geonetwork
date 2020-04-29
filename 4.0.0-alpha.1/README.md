@@ -7,7 +7,7 @@ To be able to generate a elasticsearch-ready docker image, you will have:
 
 ```shell
 git clone https://github.com/geonetwork/docker-geonetwork.git
-cd docker-geonetwork/3.99.0
+cd docker-geonetwork/4.0.0-alpha.1
 ```
 
 3.Get the generated webapp in the current directory, name it `geonetwork.war
@@ -23,7 +23,7 @@ docker-compose build && docker-compose up
 
 5. Open http://localhost:8080/geonetwork/ in a browser
 
-# Dabase configuration
+# Database configuration
 
 The provided docker-compose shows an example of using GeoNetwork with an
 external database (based on the `mdillon/postgis` docker image). If the
