@@ -1,10 +1,11 @@
 version: '3.1'
 volumes:
   geonetwork:
+  esdata:
+  pgdata:
 
 services:
   geonetwork:
-    build: .
     image: geonetwork:4.0.0-alpha.1
     restart: always
     ports:
@@ -20,7 +21,6 @@ services:
       # configuration and will require an external database (see the database
       # service below)
       POSTGRES_DB_HOST: database
-
       POSTGRES_DB_NAME: geonetwork
       POSTGRES_DB_USERNAME: geonetwork
       POSTGRES_DB_PASSWORD: geonetwork
@@ -36,6 +36,8 @@ services:
     image: elasticsearch:7.6.2
     environment:
       discovery.type: single-node
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
 
   kibana:
     image: kibana:7.6.2
@@ -48,4 +50,6 @@ services:
       POSTGRES_USER: geonetwork
       POSTGRES_PASSWORD: geonetwork
       POSTGRES_DB: geonetwork
+    volumes: 
+      - pgdata:/var/lib/postgresql/data
 

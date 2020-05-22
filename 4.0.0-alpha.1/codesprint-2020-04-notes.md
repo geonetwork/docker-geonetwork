@@ -11,7 +11,7 @@ For now, we will set the following environment variable in our compo:
 discovery.type: single-node
 ```
 
-# Working scenarii
+# Working scenario
 
 Shall we keep a "standalone GN image" ? For Geonetwork with integrated h2, it
 seems possible, but having an Elasticsearch in the same docker image as
