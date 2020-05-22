@@ -8,6 +8,7 @@ declare -A aliases=(
         [3.6.0]='3.6'
         [3.8.3]='3.8'
 		[3.10.2]='3.10 latest'
+		[4.0.0-alpha.1]='4.0.0-alpha 4.0-alpha 4-alpha'
 
 )
 
