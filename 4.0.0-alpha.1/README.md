@@ -84,14 +84,15 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml docker-compose up
 
 ## Database configuration
 
-The provided docker-compose shows an example of using GeoNetwork with an
-external database (based on the `mdillon/postgis` docker image). If the
-environment variables related to the database from the `geonetwork` service are
-not defined, then the geonetwork will launch with an integrated h2 database.
-
-As soon as the `POSTGRES_DB_HOST` variable is defined on the `geonetwork`
-service, the docker entrypoint will reconfigure at runtime to target this type
-of database, and it will require the other related env variables to be defined
-as well (username, password, db name and so on).
+See "Connecting to a postgres database" https://hub.docker.com/_/geonetwork
 
 
+```shell
+docker run --name geonetwork -d -p 8080:8080 \
+-e POSTGRES_DB_HOST=my-db-host \
+-e POSTGRES_DB_PORT=5434 \
+-e POSTGRES_DB_USERNAME=postgres  \
+-e POSTGRES_DB_PASSWORD=mysecretpassword \
+-e POSTGRES_DB_NAME=mydbname \
+geonetwork:4.0.0-alpha
+```
