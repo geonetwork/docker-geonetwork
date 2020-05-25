@@ -10,7 +10,7 @@ if [ "$1" = 'catalina.sh' ]; then
 
     # postgresql mode enabled: reconfigure the webapp to enable postgres configuration
 
-    if [ $POSTGRES_DB_HOST != "" ]; then
+    if [ "$POSTGRES_DB_HOST" != "" ]; then
         #Setting host (use $POSTGRES_DB_HOST if it's set, otherwise use "postgres")
         db_host="${POSTGRES_DB_HOST:-postgres}"
         echo "db host: $db_host"

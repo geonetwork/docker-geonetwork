@@ -1,4 +1,39 @@
-# Usage
+# Version 4.0.0-alpha1
+
+## Running with integrated Elasticsearch
+
+1. Clone this repository
+
+```shell
+git clone https://github.com/geonetwork/docker-geonetwork.git
+cd docker-geonetwork/4.0.0-alpha.1
+```
+
+2. Run the docker-composition from the current directory:
+
+```shell
+docker-compose up
+```
+
+3. Open http://localhost:8080/geonetwork/ in a browser
+
+
+
+## Running with remote Elasticsearch
+
+
+```shell
+docker run -p 8080:8080 \
+-e "ES_HOST=my-es-host" \
+-e "ES_PORT=9200" \
+-e "ES_PROTOCOL=http" \
+-e "KB_URL=http://my-kb-host:5601" \
+geonetwork:4.0.0-alpha
+```
+
+
+## Running with custom geonetwork.war
+
 
 This directory includes two Dockerfiles:
 * `Dockerfile` is cannonical one used to generate the Docker Hub official 
@@ -12,8 +47,8 @@ It also includes two docker-compose configuration files.
 `docker-compose.yml` and build the GeoNetwork image using `Dockerfile.local`.
 
 
+### Pre-built image
 
-## Pre-built image
 To use the pre-built image you can use the `docker-compose.yml` file provided 
 in this directory:
 
@@ -21,9 +56,9 @@ in this directory:
 docker-compose up 
 ```
 
-## Local image
+### Local image
 
-To be able to generate a elasticsearch-ready docker image, you will have:
+To be able to generate an elasticsearch-ready docker image, you will have:
 
 1. Build your geonetwork.war (https://geonetwork-opensource.org/manuals/trunk/en/maintainer-guide/installing/installing-from-source-code.html#the-quick-way)
 2. Clone this repository
