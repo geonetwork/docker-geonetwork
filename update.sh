@@ -10,7 +10,9 @@ fi
 versions=( "${versions[@]%/}" )
 
 for version in "${versions[@]}"; do
-	md5="$(curl -fsSL --retry 5 "https://sourceforge.net/projects/geonetwork/files/GeoNetwork_opensource/v${version}/geonetwork.war.md5/download")"
+	echo "Updating Dockerfile for ${version} version"
+	md5="$(curl -fsSL --retry 5 "https://sourceforge.net/projects/geonetwork/files/GeoNetwork_opensource/v${version}/geonetwork.war.md5/download" | awk '{print $1;}')"
+	echo "MD5 for GeoNetwork ${version} is ${md5}"
 
 	sed -ri \
 		-e 's/^(ENV GN_VERSION) .*/\1 '"$version"'/' \
