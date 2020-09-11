@@ -77,7 +77,7 @@ cp ../../core-geonetwork/web/target/geonetwork.war .
 4. Run the docker-composition from the current directory:
 
 ```shell
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml docker-compose up --build
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
 5. Open http://localhost:8080/geonetwork/ in a browser

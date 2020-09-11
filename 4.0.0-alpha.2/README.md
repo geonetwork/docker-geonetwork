@@ -70,6 +70,7 @@ docker-compose up
 To be able to generate an elasticsearch-ready docker image, you will have:
 
 1. Build your geonetwork.war (https://geonetwork-opensource.org/manuals/trunk/en/maintainer-guide/installing/installing-from-source-code.html#the-quick-way)
+
 2. Clone this repository
 
 ```shell
@@ -86,7 +87,7 @@ cp ../../core-geonetwork/web/target/geonetwork.war .
 4. Run the docker-composition from the current directory:
 
 ```shell
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml docker-compose up --build
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
 5. Open http://localhost:8080/geonetwork/ in a browser

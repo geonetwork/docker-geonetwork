@@ -6,19 +6,14 @@ ENV GN_DOWNLOAD_MD5 TODO
 
 USER root
 RUN apt-get -y update && \
-    apt-get -y install vim \
-    wget \
-    curl \
-    sudo
-
-RUN mkdir -p /catalogue-data && \
-    chown -R jetty:jetty /catalogue-data
-
-RUN mkdir -p /var/lib/jetty/webapps/geonetwork && \
+    apt-get -y install curl && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /catalogue-data && \
+    chown -R jetty:jetty /catalogue-data && \
+    mkdir -p /var/lib/jetty/webapps/geonetwork && \
     chown -R jetty:jetty /var/lib/jetty/webapps/geonetwork
 
 USER jetty
-
 RUN cd /var/lib/jetty/webapps/geonetwork/ && \
     curl -fSL -o $GN_FILE \
      https://sourceforge.net/projects/geonetwork/files/GeoNetwork_unstable_development_versions/${GN_VERSION}/geonetwork.war/download && \
@@ -27,4 +22,5 @@ RUN cd /var/lib/jetty/webapps/geonetwork/ && \
      rm geonetwork.war
 
 COPY ./docker-entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh", "jetty.start"]
+ENTRYPOINT ["/entrypoint.sh"]
+CMD [ "jetty.start" ]

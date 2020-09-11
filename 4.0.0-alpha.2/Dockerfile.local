@@ -4,18 +4,12 @@ ENV GN_FILE geonetwork.war
 ENV GN_VERSION 4.0.0-alpha.2
 
 USER root
-RUN apt-get -y update && \
-    apt-get -y install vim \
-    sudo
-
 RUN mkdir -p /catalogue-data && \
-    chown -R jetty:jetty /catalogue-data
-
-RUN mkdir -p /var/lib/jetty/webapps/geonetwork && \
+    chown -R jetty:jetty /catalogue-data && \
+    mkdir -p /var/lib/jetty/webapps/geonetwork && \
     chown -R jetty:jetty /var/lib/jetty/webapps/geonetwork
 
 USER jetty
-
 COPY geonetwork.war /var/lib/jetty/webapps/geonetwork/geonetwork.war
 
 RUN  cd /var/lib/jetty/webapps/geonetwork/ && \
@@ -23,4 +17,5 @@ RUN  cd /var/lib/jetty/webapps/geonetwork/ && \
      rm geonetwork.war
 
 COPY ./docker-entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh", "jetty.start"]
+ENTRYPOINT ["/entrypoint.sh"]
+CMD [ "jetty.start" ]
