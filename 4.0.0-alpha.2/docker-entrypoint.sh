@@ -2,7 +2,6 @@
 set -e
 
 if [ "$1" = 'jetty.start' ]; then
-  # Reconfigure Elasticsearch & Kibana if necessary
   if [ "$ES_HOST" != "localhost" ]; then
       sed -i "s#http://localhost:9200#${ES_PROTOCOL}://${ES_HOST}:${ES_PORT}#g" $JETTY_BASE/webapps/geonetwork/WEB-INF/web.xml ;
       sed -i "s#es.host=localhost#es.host=${ES_HOST}#" $JETTY_BASE/webapps/geonetwork/WEB-INF/config.properties ;
