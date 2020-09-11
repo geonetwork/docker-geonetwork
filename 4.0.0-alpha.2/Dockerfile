@@ -4,7 +4,6 @@ ENV GN_FILE geonetwork.war
 ENV GN_VERSION 4.0.0-alpha.2
 ENV GN_DOWNLOAD_MD5 TODO
 
-ARG id
 USER root
 RUN apt-get -y update && \
     apt-get -y install vim \
