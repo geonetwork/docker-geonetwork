@@ -3,10 +3,7 @@ FROM jetty:9-jre8
 ENV GN_FILE geonetwork.war
 ENV GN_VERSION 4.0.0-alpha.2
 
-ARG id
-
 USER root
-
 RUN apt-get -y update && \
     apt-get -y install vim \
     sudo
