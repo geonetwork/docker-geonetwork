@@ -18,4 +18,4 @@ RUN  cd /var/lib/jetty/webapps/geonetwork/ && \
 
 COPY ./docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
-CMD [ "jetty.start" ]
+CMD ["jetty.start"]

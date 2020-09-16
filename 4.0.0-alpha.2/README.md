@@ -4,25 +4,32 @@
 
 1. Clone this repository
 
-```shell
+```shell script
 git clone https://github.com/geonetwork/docker-geonetwork.git
 cd docker-geonetwork/4.0.0-alpha.2
 ```
 
 2. Run the docker-composition from the current directory:
 
-```shell
+```shell script
 docker-compose up
 ```
 
 3. Open http://localhost:8080/geonetwork/ in a browser
 
 
+## Build docker image
+
+If not published, you can build the image locally using:
+
+```shell script
+docker build .
+```
 
 ## Running with remote Elasticsearch
 
 
-```shell
+```shell script
 docker run -p 8080:8080 \
 -e "GEONETWORK_DB_NAME=/tmp/gndb" \
 -e "ES_HOST=my-elasticsearch-host" \
@@ -45,7 +52,7 @@ discovery.seed_hosts: []
 
 
 This directory includes two Dockerfiles:
-* `Dockerfile` is cannonical one used to generate the Docker Hub official 
+* `Dockerfile` is canonical one used to generate the Docker Hub official 
 image. It downloads GeoNetwork 4.0.0-alpha.2 WAR file from sourceforge.  
 * `Dockerfile.local` needs a `geonetwork.war` file next to it to build
 the image.
@@ -61,7 +68,7 @@ It also includes two docker-compose configuration files.
 To use the pre-built image you can use the `docker-compose.yml` file provided 
 in this directory:
 
-```shell
+```shell script
 docker-compose up 
 ```
 
@@ -73,7 +80,7 @@ To be able to generate an elasticsearch-ready docker image, you will have:
 
 2. Clone this repository
 
-```shell
+```shell script
 git clone https://github.com/geonetwork/docker-geonetwork.git
 cd docker-geonetwork/4.0.0-alpha.2
 ```
@@ -86,7 +93,7 @@ cp ../../core-geonetwork/web/target/geonetwork.war .
 
 4. Run the docker-composition from the current directory:
 
-```shell
+```shell script
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
@@ -97,7 +104,7 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 See "Connecting to a postgres database" https://hub.docker.com/_/geonetwork
 
 
-```shell
+```shell script
 docker run --name geonetwork -d -p 8080:8080 \
 -e GEONETWORK_DB_TYPE=postgres \
 -e GEONETWORK_DB_HOST=my-db-host \

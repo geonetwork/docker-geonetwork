@@ -1,8 +1,8 @@
 FROM jetty:9-jre8
 
-ENV GN_FILE geonetwork.war
+ENV GN_FILE GeoNetwork-4.0.0-alpha.2.war
 ENV GN_VERSION 4.0.0-alpha.2
-ENV GN_DOWNLOAD_MD5 TODO
+ENV GN_DOWNLOAD_MD5 f6090659f67b313637760882e256c23b
 
 USER root
 RUN apt-get -y update && \
@@ -15,12 +15,12 @@ RUN apt-get -y update && \
 
 USER jetty
 RUN cd /var/lib/jetty/webapps/geonetwork/ && \
-    curl -fSL -o $GN_FILE \
-     https://sourceforge.net/projects/geonetwork/files/GeoNetwork_unstable_development_versions/${GN_VERSION}/geonetwork.war/download && \
-     echo "$GN_DOWNLOAD_MD5 *${GN_FILE}" | md5sum -c \
+    curl -fSL -o geonetwork.war \
+     https://sourceforge.net/projects/geonetwork/files/GeoNetwork_unstable_development_versions/${GN_VERSION}/$GN_FILE/download && \
+     echo "$GN_DOWNLOAD_MD5 *geonetwork.war" | md5sum -c && \
      unzip geonetwork.war && \
      rm geonetwork.war
 
 COPY ./docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
-CMD [ "jetty.start" ]
+CMD ["jetty.start"]
