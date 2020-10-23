@@ -7,7 +7,7 @@ volumes:
 
 services:
   geonetwork:
-    image: TODO
+    image: f58da63c3ac9
     restart: always
     ports:
       - 8080:8080

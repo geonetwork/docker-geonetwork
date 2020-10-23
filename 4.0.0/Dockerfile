@@ -2,7 +2,7 @@ FROM jetty:9-jre8
 
 ENV GN_FILE GeoNetwork-4.0.0-0.war
 ENV GN_VERSION 4.0.0
-ENV GN_DOWNLOAD_MD5 TODO
+ENV GN_DOWNLOAD_MD5 6cf3524a0e3e51e713402b97e086ba20
 
 USER root
 RUN apt-get -y update && \
@@ -16,7 +16,7 @@ RUN apt-get -y update && \
 USER jetty
 RUN cd /var/lib/jetty/webapps/geonetwork/ && \
     curl -fSL -o geonetwork.war \
-     https://sourceforge.net/projects/geonetwork/files/GeoNetwork_unstable_development_versions/${GN_VERSION}/$GN_FILE/download && \
+     https://sourceforge.net/projects/geonetwork/files/GeoNetwork_opensource/v${GN_VERSION}/$GN_FILE/download && \
      echo "$GN_DOWNLOAD_MD5 *geonetwork.war" | md5sum -c && \
      unzip geonetwork.war && \
      rm geonetwork.war
