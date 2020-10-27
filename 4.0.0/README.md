@@ -35,6 +35,7 @@ docker run -p 8080:8080 \
 -e "ES_HOST=my-elasticsearch-host" \
 -e "ES_PORT=9200" \
 -e "ES_PROTOCOL=http" \
+-e "ES_INDEX_RECORDS=gn-records" \
 -e "KB_URL=http://my-kibana-host:5601" \
 geonetwork:4.0.0
 ```

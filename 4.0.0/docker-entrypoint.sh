@@ -42,6 +42,10 @@ if [[ "$1" = jetty.sh ]] || [[ $(expr "$*" : 'java .*/start\.jar.*$') != 0 ]]; t
         sed -i "s#es.port=9200#es.port=${ES_PORT}#" "${JETTY_BASE}/webapps/geonetwork/WEB-INF/config.properties" ;
     fi
 
+    if [ -n "${ES_INDEX_RECORDS}" ] && [ "$ES_INDEX_RECORDS" != "gn-records" ] ; then
+        sed -i "s#es.index.records=gn-records#es.index.records=${ES_INDEX_RECORDS}#" "${JETTY_BASE}/webapps/geonetwork/WEB-INF/config.properties" ;
+    fi
+
     if [ "${ES_USERNAME}" != "" ] ; then
         sed -i "s#es.username=#es.username=${ES_USERNAME}#" "${JETTY_BASE}/webapps/geonetwork/WEB-INF/config.properties" ;
     fi
