@@ -7,8 +7,7 @@ volumes:
 
 services:
   geonetwork:
-    #image: geonetwork:4
-    image: gn4
+    image: geonetwork:4
 
     restart: always
     ports:
