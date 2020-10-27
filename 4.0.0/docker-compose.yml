@@ -7,14 +7,16 @@ volumes:
 
 services:
   geonetwork:
-    image: f58da63c3ac9
+    #image: geonetwork:4
+    image: gn4
+
     restart: always
     ports:
       - 8080:8080
     environment:
       DATA_DIR: /catalogue-data
 
-      JAVA_OPTIONS: >
+      JAVA_OPTS: >
         -Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF
         -Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true
         -Xms512M -Xss512M -Xmx2G -XX:+UseConcMarkSweepGC
