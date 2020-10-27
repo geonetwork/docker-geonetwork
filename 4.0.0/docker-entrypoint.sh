@@ -17,11 +17,11 @@ if [[ "$1" = jetty.sh ]] || [[ $(expr "$*" : 'java .*/start\.jar.*$') != 0 ]]; t
 			********************************************************************
 			WARNING: Environment variable ES_HOST is mandatory
 
-			    GeoNetwork requires an Elasticsearch instance to store the 
-                index.Plese define the variable ES_HOST with the Elasticsearch 
-			    host name. For example
+			GeoNetwork requires an Elasticsearch instance to store the index.
+			Please define the variable ES_HOST with the Elasticsearch 
+			host name. For example
 
-			    docker run -e ES_HOST=elasticsearch geonetwork:${GN_VERSION}
+			docker run -e ES_HOST=elasticsearch geonetwork:${GN_VERSION}
 
 			********************************************************************
 		EOWARN
