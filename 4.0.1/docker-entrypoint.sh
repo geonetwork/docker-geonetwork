@@ -9,8 +9,7 @@ fi
 
 if [[ "$1" = jetty.sh ]] || [[ $(expr "$*" : 'java .*/start\.jar.*$') != 0 ]]; then
     # this is a command to run jetty
-    echo "$@"
-
+    
     # Sanity check: ES_HOST variable is mandatory
     if [ -z "${ES_HOST}" ]; then
         cat >&2 <<- EOWARN
