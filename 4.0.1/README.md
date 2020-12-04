@@ -115,3 +115,15 @@ docker run --name geonetwork -d -p 8080:8080 \
 -e GEONETWORK_DB_NAME=mydbname \
 geonetwork:4.0.1
 ```
+
+
+## Monitoring
+
+A composition is also available for monitoring metrics and logs 
+for the webserver and the database. Use the following 
+to start metricbeat and filebeat:
+
+```shell script
+docker-compose -f docker-compose.yml -f docker-compose.monitoring.yml up --build
+```
+
