@@ -1,11 +1,11 @@
 - module: nginx
   access:
     enabled: true
-    var.paths: ["/usr/share/filebeat/analyzedlogs/nginx/access.log*"]
+    var.paths: ["/usr/share/filebeat/analyzedlogs/nginx/gn-access.log*"]
 
   error:
     enabled: true
-    var.paths: ["/usr/share/filebeat/analyzedlogs/nginx/error.log*"]
+    var.paths: ["/usr/share/filebeat/analyzedlogs/nginx/gn-error.log*"]
 
   ingress_controller:
     enabled: false

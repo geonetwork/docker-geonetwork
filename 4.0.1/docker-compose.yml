@@ -19,8 +19,14 @@ services:
     image: nginx
     ports:
       - 80:80
+    environment:
+      # Only used for / redirect to default webapp
+      - NGINX_PUBLIC_HOST=localhost
+      #- NGINX_PUBLIC_HOST=apps.titellus.net
+      - NGINX_HOST=0.0.0.0
+      - NGINX_PORT=80
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx:/etc/nginx/templates
       - nginxlog:/var/log/nginx
     depends_on:
       - geonetwork
@@ -103,6 +109,8 @@ services:
 
   elasticsearch:
     image: elasticsearch:7.9.2
+    ports:
+      - 9200:9200
     ulimits:
       memlock:
         soft: -1
@@ -123,8 +131,8 @@ services:
     environment:
       SERVER_NAME: 'kibana'
       ELASTICSEARCH_URL: http://elasticsearch:9200/
-#      SERVER_BASEPATH: /geonetwork/dashboards
-#      SERVER_REWRITEBASEPATH: 'false'
+      SERVER_BASEPATH: /geonetwork/dashboards
+      SERVER_REWRITEBASEPATH: 'false'
       KIBANA_INDEX: .dashboards
       XPACK_MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED: 'true'
     networks:

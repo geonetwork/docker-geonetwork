@@ -6,9 +6,12 @@ setup.template.settings:
   index.number_of_shards: 1
   index.codec: best_compression
 
-setup:
-  kibana.host: "kibana:5601"
+setup.kibana:
+  host: "www:80"
+  path: "/geonetwork/dashboards"
   space.id: catalogue-monitor
+  username: admin
+  password: admin
 
 setup.dashboards:
   index: "gn-logs-*"
