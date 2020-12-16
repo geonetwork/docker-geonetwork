@@ -115,3 +115,26 @@ docker run --name geonetwork -d -p 8080:8080 \
 -e GEONETWORK_DB_NAME=mydbname \
 geonetwork:4.0.1
 ```
+
+
+## Monitoring
+
+A composition is also available for monitoring metrics and logs 
+for the webserver and the database. 
+
+First start the composition without monitoring containers.
+In Kibana go to `Manage space` and create a `catalogue-monitor` space.
+This space will be populated with default dashboards by metricbeat and filebeat.
+
+Once the space created, use the following to start metricbeat and filebeat:
+
+```shell script
+docker-compose -f docker-compose.monitoring.yml up --build 
+```
+
+Metricbeat and filebeat needs to authenticate to push into Kibana (GeoNetwork is checking access). Adapt password
+ if needed in configuration files for `setup.kibana.username` and `setup.kibana.password`. 
+
+Once started, sample dashboards analyzing the GeoNetwork API usage are available in `catalogue-log-dashboard.ndjson`.
+
+![Dashboard](catalogue-log-dashboard.png)
