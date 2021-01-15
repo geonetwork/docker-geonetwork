@@ -1,0 +1,30 @@
+FROM jetty:9-jre8
+
+ENV GN_FILE geonetwork.war
+ENV GN_VERSION 4.0.2
+
+ENV DATA_DIR /catalogue-data
+ENV JAVA_OPTS -Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF \
+        -Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true \
+        -Xms512M -Xss512M -Xmx2G -XX:+UseConcMarkSweepGC \
+        -Dgeonetwork.resources.dir=${DATA_DIR}/resources \
+        -Dgeonetwork.data.dir=${DATA_DIR} \
+        -Dgeonetwork.codeList.dir=/var/lib/jetty/webapps/geonetwork/WEB-INF/data/config/codelist \
+        -Dgeonetwork.schema.dir=/var/lib/jetty/webapps/geonetwork/WEB-INF/data/config/schema_plugins 
+
+USER root
+RUN mkdir -p /catalogue-data && \
+    chown -R jetty:jetty /catalogue-data && \
+    mkdir -p /var/lib/jetty/webapps/geonetwork && \
+    chown -R jetty:jetty /var/lib/jetty/webapps/geonetwork
+
+USER jetty
+COPY geonetwork.war /var/lib/jetty/webapps/geonetwork/geonetwork.war
+
+RUN  cd /var/lib/jetty/webapps/geonetwork/ && \
+     unzip geonetwork.war && \
+     rm geonetwork.war
+
+COPY ./docker-entrypoint.sh /geonetwork-entrypoint.sh
+ENTRYPOINT ["/geonetwork-entrypoint.sh"]
+CMD ["java","-jar","/usr/local/jetty/start.jar"]
