@@ -129,7 +129,7 @@ This space will be populated with default dashboards by metricbeat and filebeat.
 Once the space created, use the following to start metricbeat and filebeat:
 
 ```shell script
-docker-compose -f docker-compose.monitoring.yml up --build 
+docker-compose -f docker-compose.yml  -f docker-compose.monitoring.yml up --build 
 ```
 
 Metricbeat and filebeat needs to authenticate to push into Kibana (GeoNetwork is checking access). Adapt password

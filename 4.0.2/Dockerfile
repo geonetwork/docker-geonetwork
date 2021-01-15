@@ -21,7 +21,7 @@ RUN apt-get -y update && \
 USER jetty
 ENV GN_FILE GeoNetwork-4.0.2-0.war
 ENV GN_VERSION 4.0.2
-ENV GN_DOWNLOAD_MD5 e9c885de19644856d855c0ea78052b12
+ENV GN_DOWNLOAD_MD5 3009549f23b6aca6ebdd851c5bf512b8
 RUN cd /var/lib/jetty/webapps/geonetwork/ && \
     curl -fSL -o geonetwork.war \
      https://sourceforge.net/projects/geonetwork/files/GeoNetwork_opensource/v${GN_VERSION}/${GN_FILE}/download && \

@@ -33,7 +33,7 @@ services:
     networks:
       - gn-network
 
-#  www2:
+#  www:
 #    image: httpd
 #    ports:
 #      - 81:80
@@ -41,9 +41,6 @@ services:
 #      - ./apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
 #      - ./apache/gn-httpd.conf:/usr/local/apache2/conf/gn-httpd.conf
 #      - apachelog:/usr/local/apache2/logs
-#    environment:
-#      - NGINX_HOST=localhost
-#      - NGINX_PORT=81
 #    depends_on:
 #      - geonetwork
 #    networks:
