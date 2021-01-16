@@ -1,1 +1,4 @@
-geonetwork
+/geonetwork
+/3.7.0-dev/m2repo_gn/*
+!/3.7.0-dev/m2repo_gn/.gitkeep
+/volume_*
