@@ -127,7 +127,7 @@ services:
     image: kibana:7.9.2
     environment:
       SERVER_NAME: 'kibana'
-      ELASTICSEARCH_URL: http://elasticsearch:9200/
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
       SERVER_BASEPATH: /geonetwork/dashboards
       SERVER_REWRITEBASEPATH: 'false'
       KIBANA_INDEX: .dashboards
