@@ -15,6 +15,9 @@ cd docker-geonetwork/4.0.4
 docker-compose up
 ```
 
+** Important note**:
+The file `/var/lib/jetty/webapps/geonetwork/WEB-INF/data/config/encryptor.properties` (if the data directory is not modified) must be mounted in a volume in case the full GeoNetwork data directory (`-Dgeonetwork.dir`) is not mounted in a volume to avoid losing the file with the GeoNetwork passwords when the container is re-created. By default this image only mounts in a volume the medatadata data directory, not the full data directory.
+
 3. Open http://localhost:8080/geonetwork/ in a browser
 
 

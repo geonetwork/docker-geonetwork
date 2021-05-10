@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.2'
 
 volumes:
   geonetwork:
@@ -67,7 +67,8 @@ services:
 
 
   geonetwork:
-    image: geonetwork:4.0.4
+    #image: geonetwork:4.0.4
+    image: gn4
     restart: always
     ports:
       - 8080:8080
@@ -97,6 +98,7 @@ services:
       GEONETWORK_DB_PASSWORD: geonetwork
     volumes:
       - geonetwork:/catalogue-data
+      - ./encryptor.properties:/var/lib/jetty/webapps/geonetwork/WEB-INF/data/config/encryptor.properties 
     depends_on:
       - elasticsearch
       - database

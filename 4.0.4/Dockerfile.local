@@ -23,7 +23,9 @@ COPY geonetwork.war /var/lib/jetty/webapps/geonetwork/geonetwork.war
 
 RUN  cd /var/lib/jetty/webapps/geonetwork/ && \
      unzip geonetwork.war && \
-     rm geonetwork.war
+     rm geonetwork.war && \
+     touch WEB-INF/data/config/encryptor.properties
+
 
 COPY ./docker-entrypoint.sh /geonetwork-entrypoint.sh
 ENTRYPOINT ["/geonetwork-entrypoint.sh"]
