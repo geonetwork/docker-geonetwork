@@ -7,8 +7,8 @@ declare -A aliases=(
         [3.4.4]='3.4'
         [3.6.0]='3.6'
         [3.8.3]='3.8'
-        [3.10.6]='3.10 3 latest'
-        [4.0.4]='4.0 4'
+        [3.10.6]='3.10 3'
+        [4.0.4]='4.0 4 latest'
 )
 
 # builds to exclude from tagging
