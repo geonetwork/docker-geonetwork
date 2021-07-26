@@ -9,8 +9,6 @@ ENV GN_VERSION 3.12.1
 ENV GN_DOWNLOAD_MD5 17f2dd60874c8efa4254d535bda98304
 
 WORKDIR $CATALINA_HOME/webapps
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
 
 RUN curl -fSL -o $GN_FILE \
      https://sourceforge.net/projects/geonetwork/files/GeoNetwork_opensource/v${GN_VERSION}/${GN_FILE}/download && \
