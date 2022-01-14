@@ -19,7 +19,6 @@ RUN curl -fSL -o $GN_FILE \
      rm geonetwork/WEB-INF/lib/log4j-core-* && \
      rm geonetwork/WEB-INF/lib/log4j-api*
 COPY log4j/ geonetwork/WEB-INF/lib
-RUN ls -lah geonetwork/WEB-INF/lib/log4j*
 
 #Set geonetwork data dir
 COPY ./docker-entrypoint.sh /entrypoint.sh
