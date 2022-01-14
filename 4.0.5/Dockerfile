@@ -27,7 +27,11 @@ RUN cd /var/lib/jetty/webapps/geonetwork/ && \
      https://sourceforge.net/projects/geonetwork/files/GeoNetwork_opensource/v${GN_VERSION}/${GN_FILE}/download && \
      echo "${GN_DOWNLOAD_MD5} *geonetwork.war" | md5sum -c && \
      unzip -q geonetwork.war && \
-     rm geonetwork.war
+     rm geonetwork.war && \
+     rm /var/lib/jetty/webapps/geonetwork/WEB-INF/lib/log4j-core-* && \
+     rm /var/lib/jetty/webapps/geonetwork/WEB-INF/lib/log4j-api*
+
+COPY log4j/ /var/lib/jetty/webapps/geonetwork/WEB-INF/lib
 
 COPY ./docker-entrypoint.sh /geonetwork-entrypoint.sh
 ENTRYPOINT ["/geonetwork-entrypoint.sh"]

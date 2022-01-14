@@ -15,7 +15,11 @@ RUN curl -fSL -o $GN_FILE \
      echo "$GN_DOWNLOAD_MD5 *${GN_FILE}" | md5sum -c && \
      mkdir -p geonetwork && \
      unzip -e $GN_FILE -d geonetwork && \
-     rm $GN_FILE
+     rm $GN_FILE && \
+     rm geonetwork/WEB-INF/lib/log4j-core-* && \
+     rm geonetwork/WEB-INF/lib/log4j-api*
+COPY log4j/ geonetwork/WEB-INF/lib
+RUN ls -lah geonetwork/WEB-INF/lib/log4j*
 
 #Set geonetwork data dir
 COPY ./docker-entrypoint.sh /entrypoint.sh
