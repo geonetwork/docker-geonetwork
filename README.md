@@ -9,7 +9,7 @@ specificially in [docker-library/docs/geonetwork](https://github.com/docker-libr
 
 # Default branch
 
-Default branch has been renamed from `master` to `main. To update it in your local repository follow these steps:
+Default branch has been renamed from `master` to `main`. To update it in your local repository follow these steps:
 ```bash
 git branch -m master main
 git fetch origin
