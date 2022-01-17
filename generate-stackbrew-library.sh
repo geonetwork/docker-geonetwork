@@ -72,6 +72,7 @@ cat <<-EOH
 Maintainers: Joana Simoes <jo@doublebyte.net> (@doublebyte1),
 	     Juan Luis Rodriguez <juanluisrp@geocat.net> (@juanluisrp)
 GitRepo: https://github.com/geonetwork/docker-geonetwork
+GitFetch: refs/heads/main
 EOH
 
 
