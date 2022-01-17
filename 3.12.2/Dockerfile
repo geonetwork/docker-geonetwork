@@ -7,6 +7,8 @@ ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true 
 #Environment variables
 ENV GN_VERSION 3.12.2
 ENV GN_DOWNLOAD_MD5 669e70d8d490d49811362889ec222192
+ENV LOG4J_VERSION=2.17.1
+ENV LOG4J_SHA512=b7e948df6c6f57d903d990de2cc0270c1537b711285e9b6b91280db6ace38418fced713785b2c20512dd9a4238c2d1d0ceb414d9936df2ca110ff14993ae04dc
 
 WORKDIR $CATALINA_HOME/webapps
 
@@ -17,9 +19,14 @@ RUN curl -fSL -o $GN_FILE \
      unzip -e $GN_FILE -d geonetwork && \
      rm $GN_FILE && \
      rm geonetwork/WEB-INF/lib/log4j-core-* && \
-     rm geonetwork/WEB-INF/lib/log4j-api*
+     rm geonetwork/WEB-INF/lib/log4j-api* && \
+     curl -fSL -o apache-log4j-${LOG4J_VERSION}-bin.tar.gz "https://dlcdn.apache.org/logging/log4j/${LOG4J_VERSION}/apache-log4j-${LOG4J_VERSION}-bin.tar.gz" && \
+     echo "${LOG4J_SHA512} apache-log4j-${LOG4J_VERSION}-bin.tar.gz" | sha512sum -c && \
+     tar -xvzf apache-log4j-${LOG4J_VERSION}-bin.tar.gz && \
+     cp apache-log4j-${LOG4J_VERSION}-bin/log4j-core-${LOG4J_VERSION}.jar "${CATALINA_HOME}/webapps/geonetwork/WEB-INF/lib/" && \
+     cp apache-log4j-${LOG4J_VERSION}-bin/log4j-api-${LOG4J_VERSION}.jar "${CATALINA_HOME}/webapps/geonetwork/WEB-INF/lib/" && \
+     rm -rf apache-log4j-${LOG4J_VERSION}-bin*
      
-COPY log4j/ geonetwork/WEB-INF/lib
 
 #Set geonetwork data dir
 COPY ./docker-entrypoint.sh /entrypoint.sh
