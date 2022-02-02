@@ -11,7 +11,7 @@ versions=( "${versions[@]%/}" )
 
 for version in "${versions[@]}"; do
 	echo "Updating Dockerfile for ${version} version"
-	md5="$(curl -fsSL --retry 5 "https://sourceforge.net/projects/geonetwork/files/GeoNetwork_opensource/v${version}/geonetwork.war.MD5/download" | awk '{print $1;}')"
+	md5="$(curl -fsSL --retry 5 "https://sourceforge.net/projects/geonetwork/files/GeoNetwork_opensource/v${version}/geonetwork.war.md5/download" | awk '{print $1;}')"
 	echo "MD5 for GeoNetwork ${version} is ${md5}"
 
 	sed -ri \
