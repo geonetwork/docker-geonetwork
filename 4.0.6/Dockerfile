@@ -1,4 +1,4 @@
-FROM jetty:9-jre8
+FROM jetty:9-jre8-openjdk
 
 ENV DATA_DIR /catalogue-data
 ENV JAVA_OPTS -Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF \
