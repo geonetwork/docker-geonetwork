@@ -8,19 +8,13 @@ declare -A aliases=(
         [3.6.0]='3.6'
         [3.8.3]='3.8'
         [3.10.10]='3.10'
-        [3.12.5]='3.12 3'
+        [3.12.4]='3.12 3'
         [4.0.6]='4.0'
 		[4.2.0]='4.2 4 latest'
 )
 
 # builds to exclude from tagging
-dirExclude=([3.0.5] \
-	[3.2.0] [3.2.1] [3.2.2] \
-	[3.4.0] [3.4.1] [3.4.2] [3.4.3] [3.4.4] \
-	[3.6.0] [3.8.0] [3.8.1] [3.8.2] [3.8.3] \
-	[3.10.0] [3.10.1] [3.10.2] [3.10.3] [3.10.4] [3.10.5] [3.10.6] [3.10.7] [3.10.8] [3.10.9] [3.10.10] \
-	[3.12.0] [3.12.1] [3.12.2] [3.12.3] [3.12.4] \
-	[4.0.0-alpha.1] [4.0.0-alpha.2] [4.0.0] [4.0.1] [4.0.2] [4.0.3] [4.0.4] [4.0.5])
+dirExclude=([3.0.5],[3.2.0],[3.2.1],[3.2.2],[3.4.0],[3.4.1],[3.4.2],[3.4.3],[3.4.4],[3.6.0],[3.8.0],[3.8.1],[3.8.2],[3.8.3],[3.10.0],[3.10.1],[3.10.2],[3.10.3],[3.10.4],[3.10.5],[3.10.6],[3.10.7],[3.10.8],[3.10.9],[3.10.10],[3.12.0],[3.12.1],[3.12.2],[3.12.3],[4.0.0-alpha.1],[4.0.0-alpha.2],[4.0.0],[4.0.1],[4.0.2],[4.0.3],[4.0.4],[4.0.5])
 
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink "$BASH_SOURCE")")"
@@ -40,13 +34,13 @@ dirCommit() {
 		cd "$dir"
 		fileCommit \
 			Dockerfile \
-			"$(git show HEAD:./Dockerfile | awk '
+			$(git show HEAD:./Dockerfile | awk '
 				toupper($1) == "COPY" {
 					for (i = 2; i < NF; i++) {
 						print $i
 					}
 				}
-			')"
+			')
 	)
 }
 
@@ -54,7 +48,7 @@ dirCommit() {
 join() {
 	local sep="$1"; shift
 	local out; printf -v out "${sep//%/%%}%s" "$@"
-	echo "${out#"$sep"}"
+	echo "${out#$sep}"
 }
 
 getArches() {
@@ -88,16 +82,16 @@ EOH
 
 
 for version in "${versions[@]}"; do
-  if ! (echo "${dirExclude[@]}" | grep -w "\[$version\]" > /dev/null) ; then
+  if ! (echo ${dirExclude[@]} | grep -w "\[$version\]" > /dev/null) ; then
 
 	commit="$(dirCommit "$version")"
 	dir="$version"
 
-	# fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '$1 == "ENV" && $2 == "GN_VERSION" { print $3; exit }')"
+	fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '$1 == "ENV" && $2 == "GN_VERSION" { print $3; exit }')"
 
 	versionAliases=(
-		"$version"
-		"${aliases[$version]:-}"
+		$version
+		${aliases[$version]:-}
 	)
 
 	variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
