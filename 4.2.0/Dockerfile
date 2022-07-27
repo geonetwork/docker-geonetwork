@@ -1,4 +1,4 @@
-FROM jetty:9-jre8-openjdk
+FROM jetty:9-jdk8
 
 ENV DATA_DIR /catalogue-data
 ENV JAVA_OPTS -Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF \
@@ -11,7 +11,9 @@ ENV JAVA_OPTS -Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF \
 
 USER root
 RUN apt-get -y update && \
-    apt-get -y install curl && \
+    apt-get -y install \
+      curl \
+      unzip && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /${DATA_DIR} && \
     chown -R jetty:jetty ${DATA_DIR} && \
