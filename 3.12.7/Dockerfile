@@ -24,6 +24,9 @@ RUN apt-get update && \
 
 #Set geonetwork data dir
 COPY ./docker-entrypoint.sh /entrypoint.sh
+
+# Needed to make GN to create logs, jcs_caching and gn H2 database in the tomcat directory.
+WORKDIR $CATALINA_HOME
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["catalina.sh", "run"]
