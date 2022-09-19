@@ -1,4 +1,4 @@
-FROM jetty:9-jre8-openjdk
+FROM jetty:9-jdk8
 
 ENV DATA_DIR /catalogue-data
 ENV JAVA_OPTS -Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF \
@@ -12,7 +12,8 @@ ENV JAVA_OPTS -Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF \
 USER root
 RUN apt-get -y update && \
     apt-get -y install --no-install-recommends \ 
-        curl && \
+        curl \
+        unzip && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /${DATA_DIR} && \
     chown -R jetty:jetty ${DATA_DIR} && \
@@ -22,7 +23,7 @@ RUN apt-get -y update && \
 USER jetty
 ENV GN_FILE geonetwork.war
 ENV GN_VERSION 4.2.1
-ENV GN_DOWNLOAD_MD5 #########
+ENV GN_DOWNLOAD_MD5 152b8cfb7806a74dc4e186e0426072e1
 
 RUN cd /var/lib/jetty/webapps/geonetwork/ && \
      curl -fSL -o geonetwork.war \
