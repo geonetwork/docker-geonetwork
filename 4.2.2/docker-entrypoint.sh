@@ -46,11 +46,11 @@ if [[ "$1" = jetty.sh ]] || [[ $(expr "$*" : 'java .*/start\.jar.*$') != 0 ]]; t
     fi
 
     if [ "${ES_USERNAME}" != "" ] ; then
-        sed -i "s#es.username=#es.username=${ES_USERNAME}#" "${JETTY_BASE}/webapps/geonetwork/WEB-INF/config.properties" ;
+        sed -i "s/es.username=.*/es.username=${ES_USERNAME}/" "${JETTY_BASE}/webapps/geonetwork/WEB-INF/config.properties" ;
     fi
 
     if [ "${ES_PASSWORD}" != "" ] ; then
-        sed -i "s#es.password=#es.password=${ES_PASSWORD}#" "${JETTY_BASE}/webapps/geonetwork/WEB-INF/config.properties" ;
+        sed -i "s/es.password=.*/es.password=${ES_PASSWORD}/" "${JETTY_BASE}/webapps/geonetwork/WEB-INF/config.properties" ;
     fi
 
     if [ -n "${KB_URL}" ] && [ "$KB_URL" != "http://localhost:5601" ]; then
