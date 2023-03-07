@@ -13,6 +13,7 @@ ENV JAVA_OPTS -Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF \
         -Dgeonetwork.schema.dir=/var/lib/jetty/webapps/geonetwork/WEB-INF/data/config/schema_plugins 
 
 USER root
+RUN apt-get update && apt-get install -y unzip
 RUN mkdir -p /catalogue-data && \
     chown -R jetty:jetty /catalogue-data && \
     mkdir -p /var/lib/jetty/webapps/geonetwork && \
