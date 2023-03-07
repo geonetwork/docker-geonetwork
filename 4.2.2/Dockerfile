@@ -15,7 +15,7 @@ RUN apt-get -y update && \
         curl \
         unzip && \
     rm -rf /var/lib/apt/lists/* && \
-    mkdir -p /${DATA_DIR} && \
+    mkdir -p ${DATA_DIR} && \
     chown -R jetty:jetty ${DATA_DIR} && \
     mkdir -p /var/lib/jetty/webapps/geonetwork && \
     chown -R jetty:jetty /var/lib/jetty/webapps/geonetwork
