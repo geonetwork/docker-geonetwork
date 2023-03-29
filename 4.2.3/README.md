@@ -1,4 +1,4 @@
-# Version 4.2.2
+# Version 4.2.3
 
 ## Running with integrated Elasticsearch
 
@@ -6,7 +6,7 @@
 
 ```shell script
 git clone https://github.com/geonetwork/docker-geonetwork.git
-cd docker-geonetwork/4.2.2
+cd docker-geonetwork/4.2.3
 ```
 
 2. Run the docker-composition from the current directory:
@@ -37,7 +37,7 @@ docker run -p 8080:8080 \
 -e "ES_PROTOCOL=http" \
 -e "ES_INDEX_RECORDS=gn-records" \
 -e "KB_URL=http://my-kibana-host:5601" \
-geonetwork:4.2.2
+geonetwork:4.2.3
 ```
 
 If you have error connecting to the remote Elasticsearch, check the configuration in `config/elasticsearch.yml`:
@@ -54,7 +54,7 @@ discovery.seed_hosts: []
 
 This directory includes two Dockerfiles:
 * `Dockerfile` is canonical one used to generate the Docker Hub official 
-image. It downloads GeoNetwork 4.2.2-0 WAR file from sourceforge.  
+image. It downloads GeoNetwork 4.2.3-0 WAR file from sourceforge.  
 * `Dockerfile.local` needs a `geonetwork.war` file next to it to build
 the image.
 
@@ -83,7 +83,7 @@ To be able to generate an elasticsearch-ready docker image, you will have:
 
 ```shell script
 git clone https://github.com/geonetwork/docker-geonetwork.git
-cd docker-geonetwork/4.2.2
+cd docker-geonetwork/4.2.3
 ```
 
 3. Get the generated webapp in the current directory, name it `geonetwork.war`
@@ -113,7 +113,7 @@ docker run --name geonetwork -d -p 8080:8080 \
 -e GEONETWORK_DB_USERNAME=postgres  \
 -e GEONETWORK_DB_PASSWORD=mysecretpassword \
 -e GEONETWORK_DB_NAME=mydbname \
-geonetwork:4.2.2
+geonetwork:4.2.3
 ```
 
 
