@@ -26,29 +26,6 @@ If not published, you can build the image locally using:
 docker build .
 ```
 
-## Running with remote Elasticsearch
-
-
-```shell script
-docker run -p 8080:8080 \
--e "GEONETWORK_DB_NAME=/tmp/gndb" \
--e "ES_HOST=my-elasticsearch-host" \
--e "ES_PORT=9200" \
--e "ES_PROTOCOL=http" \
--e "ES_INDEX_RECORDS=gn-records" \
--e "KB_URL=http://my-kibana-host:5601" \
-geonetwork:4.2.5
-```
-
-If you have error connecting to the remote Elasticsearch, check the configuration in `config/elasticsearch.yml`:
-
-```yaml
-network.host: my-elasticsearch-host
-discovery.seed_hosts: []
-```
-
-
-
 ## Running with custom geonetwork.war
 
 
@@ -100,21 +77,103 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 
 5. Open http://localhost:8080/geonetwork/ in a browser
 
-## Database configuration
+## Running with a custom Database
 
 See "Connecting to a postgres database" https://hub.docker.com/_/geonetwork
 
 
 ```shell script
 docker run --name geonetwork -d -p 8080:8080 \
--e GEONETWORK_DB_TYPE=postgres \
--e GEONETWORK_DB_HOST=my-db-host \
--e GEONETWORK_DB_PORT=5434 \
--e GEONETWORK_DB_USERNAME=postgres  \
--e GEONETWORK_DB_PASSWORD=mysecretpassword \
--e GEONETWORK_DB_NAME=mydbname \
-geonetwork:4.2.5
+           -e GEONETWORK_DB_TYPE=postgres \
+           -e GEONETWORK_DB_HOST=my-db-host \
+           -e GEONETWORK_DB_PORT=5434 \
+           -e GEONETWORK_DB_USERNAME=postgres  \
+           -e GEONETWORK_DB_PASSWORD=mysecretpassword \
+           -e GEONETWORK_DB_NAME=mydbname \
+           geonetwork:4.2.5
 ```
+
+## Running with remote Elasticsearch
+
+```shell script
+docker run --name geonetwork -d -p 8080:8080 \
+       -e "GN_CONFIG_PROPERTIES=-Des.host=elasticsearch \
+          -Des.protocol=http \
+          -Des.port=9200 \
+          -Des.url=http://elasticsearch:9200 \
+          -Dgeonetwork.ESFeaturesProxy.targetUri=http://elasticsearch:9200/geo-features/{_} " \
+       geonetwork:4.2.5
+```
+
+If you have error connecting to the remote Elasticsearch, check the configuration in `config/elasticsearch.yml`:
+
+```yaml
+network.host: my-elasticsearch-host
+discovery.seed_hosts: []
+```
+
+## Running with custom Elasticsearch index names
+
+Add the following options to `GN_CONFIG_PROPERTIES`:
+
+```
+-Des.index.records=geo-records 
+-Des.index.features=geo-features 
+-Des.index.searchlogs=geo-searchlogs 
+-Dgeonetwork.ESFeaturesProxy.targetUri=http://elasticsearch:9200/geo-features/{_}
+```
+
+
+## Running with remote Elasticsearch with authentication
+
+Add the `-Des.username=esUserName -Des.password=esPassword` options to `GN_CONFIG_PROPERTIES`.
+
+If using the WFS features harvesting, add the
+`-Dgeonetwork.ESFeaturesProxy.username=esReadOnlyUsername -Dgeonetwork.ESFeaturesProxy.password=esPassword` options to `GN_CONFIG_PROPERTIES`.
+
+
+## Running with remote Kibana
+
+Add the `-Dgeonetwork.HttpDashboardProxy.targetUri=http://kibana:5601` options to `GN_CONFIG_PROPERTIES`.
+
+
+## Running with remote OGC API Records
+
+Add the `-Dgeonetwork.MicroServicesProxy.targetUri=http://ogc-api-records-service:8080` options to `GN_CONFIG_PROPERTIES`.
+
+
+## Running with custom security mode
+
+Add the `-Dgeonetwork.security.type=` to set the authentication mode. See available security modes in https://github.com/geonetwork/core-geonetwork/blob/main/web/src/main/webapp/WEB-INF/config-security/config-security.xml#L43-L64 and configuration options in https://github.com/geonetwork/core-geonetwork/blob/main/web/src/main/webapp/WEB-INF/config-security/config-security.properties. See also https://geonetwork-opensource.org/manuals/4.0.x/en/administrator-guide/managing-users-and-groups/authentication-mode.html.
+
+
+eg. LDAP configuration:
+```
+-Dgeonetwork.security.type=ldap
+-Dldap.host=ldap
+-Dldap.port=389
+-Dldap.base=dc=geonetwork-opensource,dc=org
+-Dldap.base.dn=dc=geonetwork-opensource,dc=org
+-Dldap.security.principal=cn=admin,dc=geonetwork-opensource,dc=org
+-Dldap.security.credentials=secret
+-Dldap.base.search.base=ou=directory
+-Dldap.sync.user.search.base=ou=directory
+-Dldap.base.dn.pattern=uid={0},ou=directory
+```
+
+eg. CAS configuration
+```
+-Dcas.baseURL=http://localhost:8080/cas
+-Dcas.login.url=http://localhost:8080/cas/login
+-Dcas.ticket.validator.url=http://cas:8080/cas
+-Dgeonetwork.https.url=http://localhost:8080/geonetwork
+```
+
+
+## Running with a custom context path
+
+
+TODO
 
 
 ## Monitoring
