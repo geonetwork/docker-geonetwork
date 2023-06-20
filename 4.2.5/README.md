@@ -176,6 +176,16 @@ eg. CAS configuration
 TODO
 
 
+## Configure the default language
+
+To configure the default application language and bypass browser language detection when redirecting from the base URL use: 
+
+```
+-Dlanguage.default=fre
+-Dlanguage.forceDefault=fre
+```
+
+
 ## Monitoring
 
 A composition is also available for monitoring metrics and logs 
