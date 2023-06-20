@@ -182,7 +182,7 @@ To configure the default application language and bypass browser language detect
 
 ```
 -Dlanguage.default=fre
--Dlanguage.forceDefault=fre
+-Dlanguage.forceDefault=true
 ```
 
 
