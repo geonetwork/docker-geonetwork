@@ -172,10 +172,11 @@ eg. CAS configuration
 
 ## Running with a custom context path
 
-
-TODO
-
-
+To run the application in a custom context path, for example in http://localhost:8080/catalogue instead of the default http://localhost:8080/geonetwork use the `WEBAPP_CONTEXT_PATH` environment variable:
+```yaml
+  environment:
+    WEBAPP_CONTEXT_PATH: /catalogue
+```
 ## Configure the default language
 
 To configure the default application language and bypass browser language detection when redirecting from the base URL use: 
