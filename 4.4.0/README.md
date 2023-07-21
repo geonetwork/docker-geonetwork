@@ -101,7 +101,7 @@ docker run --name geonetwork -d -p 8080:8080 \
           -Des.protocol=http \
           -Des.port=9200 \
           -Des.url=http://elasticsearch:9200 \
-          -Dgeonetwork.ESFeaturesProxy.targetUri=http://elasticsearch:9200/geo-features/{_} " \
+          -Dgeonetwork.ESFeaturesProxy.targetUri=http://elasticsearch:9200/gn-features/{_} " \
        geonetwork:4.4.0
 ```
 
