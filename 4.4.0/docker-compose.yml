@@ -1,4 +1,55 @@
-version: '3.1'
+version: '3.8'
+
+x-geonetwork-environment:
+  &default-geonetwork-environment
+  WEBAPP_CONTEXT_PATH: /geonetwork
+  DATA_DIR: /catalogue-data
+
+  JAVA_OPTS: >-
+    -Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true
+    -Xms512M -Xss512M -Xmx2G -XX:+UseConcMarkSweepGC
+    -Djetty.httpConfig.requestHeaderSize=32768
+    -Dorg.eclipse.jetty.server.Request.maxFormContentSize=500000
+  # For remote debug
+  # -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+
+  GN_CONFIG_PROPERTIES: >-
+    -Dgeonetwork.dir=/catalogue-data
+    -Dgeonetwork.formatter.dir=/catalogue-data/data/formatter
+    -Dgeonetwork.schema.dir=/opt/geonetwork/WEB-INF/data/config/schema_plugins
+    -Dgeonetwork.indexConfig.dir=/opt/geonetwork/WEB-INF/data/config/index
+    -Des.host=elasticsearch
+    -Des.protocol=http
+    -Des.port=9200
+    -Des.url=http://elasticsearch:9200
+    -Des.username=
+    -Des.password=
+    -Dgeonetwork.ESFeaturesProxy.targetUri=http://elasticsearch:9200/gn-features/{_}
+    -Dgeonetwork.HttpDashboardProxy.targetUri=http://kibana:5601
+    -Dgeonetwork.MicroServicesProxy.targetUri=http://ogc-api-records-service:8080
+
+  GEONETWORK_DB_TYPE: postgres
+  GEONETWORK_DB_HOST: database
+  GEONETWORK_DB_PORT: 5432
+  GEONETWORK_DB_NAME: geonetwork
+  GEONETWORK_DB_USERNAME: geonetwork
+  GEONETWORK_DB_PASSWORD: geonetwork
+
+
+x-service-geonetwork:
+  &default-service-geonetwork
+  image: geonetwork:4.4.0
+  restart: always
+  ports:
+    - 8080:8080
+  volumes:
+    - geonetwork:/catalogue-data
+  depends_on:
+    - elasticsearch
+    - database
+  networks:
+    - gn-network
+
 
 volumes:
   geonetwork:
@@ -68,52 +119,11 @@ services:
     networks:
       - gn-network
 
-
   geonetwork:
-    image: geonetwork:4.4.0
-    restart: always
-    ports:
-      - 8080:8080
+    <<: *default-service-geonetwork
     environment:
-      WEBAPP_CONTEXT_PATH: /geonetwork
-      DATA_DIR: /catalogue-data
+      <<: *default-geonetwork-environment
 
-      JAVA_OPTS: >-
-        -Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true
-        -Xms512M -Xss512M -Xmx2G -XX:+UseConcMarkSweepGC
-        -Djetty.httpConfig.requestHeaderSize=32768
-        -Dorg.eclipse.jetty.server.Request.maxFormContentSize=500000
-      # For remote debug
-      # -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
-
-      GN_CONFIG_PROPERTIES: >-
-        -Dgeonetwork.dir=/catalogue-data
-        -Dgeonetwork.formatter.dir=/catalogue-data/data/formatter
-        -Dgeonetwork.schema.dir=/opt/geonetwork/WEB-INF/data/config/schema_plugins
-        -Dgeonetwork.indexConfig.dir=/opt/geonetwork/WEB-INF/data/config/index
-        -Des.host=elasticsearch
-        -Des.protocol=http
-        -Des.port=9200
-        -Des.url=http://elasticsearch:9200
-        -Des.username=
-        -Des.password=
-        -Dgeonetwork.ESFeaturesProxy.targetUri=http://elasticsearch:9200/gn-features/{_}
-        -Dgeonetwork.HttpDashboardProxy.targetUri=http://kibana:5601
-        -Dgeonetwork.MicroServicesProxy.targetUri=http://ogc-api-records-service:8080
-
-      GEONETWORK_DB_TYPE: postgres
-      GEONETWORK_DB_HOST: database
-      GEONETWORK_DB_PORT: 5432
-      GEONETWORK_DB_NAME: geonetwork
-      GEONETWORK_DB_USERNAME: geonetwork
-      GEONETWORK_DB_PASSWORD: geonetwork
-    volumes:
-      - geonetwork:/catalogue-data
-    depends_on:
-      - elasticsearch
-      - database
-    networks:
-      - gn-network
 
   ogc-api-records-service:
     image: geonetwork/gn-cloud-ogc-api-records-service:4.2.5-0
