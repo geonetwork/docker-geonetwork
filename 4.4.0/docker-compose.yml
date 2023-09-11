@@ -10,7 +10,7 @@ x-geonetwork-environment:
     -Xms512M -Xss512M -Xmx2G -XX:+UseConcMarkSweepGC
     -Djetty.httpConfig.requestHeaderSize=32768
     -Dorg.eclipse.jetty.server.Request.maxFormContentSize=500000
-    -Dorg.eclipse.jetty.server.Request.maxFormKeys=8000
+    -Dorg.eclipse.jetty.server.Request.maxFormKeys=4000
   # For remote debug
   # -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
 
