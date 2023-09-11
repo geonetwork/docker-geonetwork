@@ -177,6 +177,7 @@ To run the application in a custom context path, for example in http://localhost
   environment:
     WEBAPP_CONTEXT_PATH: /catalogue
 ```
+
 ## Configure the default language
 
 To configure the default application language and bypass browser language detection when redirecting from the base URL use: 
@@ -185,6 +186,38 @@ To configure the default application language and bypass browser language detect
 -Dlanguage.default=fre
 -Dlanguage.forceDefault=true
 ```
+
+## Clustering (experimental)
+
+The clustering mode allows to start more than one GeoNetwork instance. 
+To enable it use the `scaled` profile. In this mode:
+* only one node will be in charge of the harvester scheduler and process the scheduled harvesting tasks
+* any node can take an harvesting task manually triggered from the harvesting console
+* webserver is configured with sticky session (ie. a user stay on the same node) 
+
+
+Nginx default webserver is replaced by `nginxproxy/nginx-proxy`
+which updates its configuration when new GeoNetwork containers are created.
+
+
+```shell script
+# Stop Nginx
+docker-compose kill www -d
+
+# Start load balancer
+docker-compose up www-lb -d
+
+# Start new instances
+docker-compose --profile scaled up --scale geonetwork-replica=2 -d
+```
+
+Known limitations:
+* Harvester schedule needs to be refreshed when database harvester configuration is modified (fix in progress) 
+* When saving application settings, some setting may require a reload of some modules 
+  * log file, 
+  * DOI configuration, 
+  * proxy configuration (use Java environment variable instead of database configuration)
+
 
 
 ## Monitoring

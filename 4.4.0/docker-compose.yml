@@ -37,11 +37,13 @@ x-geonetwork-environment:
   GEONETWORK_DB_NAME: geonetwork
   GEONETWORK_DB_USERNAME: geonetwork
   GEONETWORK_DB_PASSWORD: geonetwork
-
+  VIRTUAL_HOST: localhost
 
 x-service-geonetwork:
   &default-service-geonetwork
   image: geonetwork:4.4.0
+  labels:
+    com.github.nginx-proxy.nginx-proxy.loadbalance: "hash $$remote_addr;"
   restart: always
   volumes:
     - geonetwork:/catalogue-data
@@ -81,6 +83,19 @@ services:
     volumes:
       - ./nginx:/etc/nginx/templates
       - nginxlog:/var/log/nginx
+    depends_on:
+      - geonetwork
+    networks:
+      - gn-network
+
+  # docker-compose --profile scaled up www-lb
+  www-lb:
+    profiles: [ "scaled" ]
+    image: nginxproxy/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
     depends_on:
       - geonetwork
     networks:
@@ -130,7 +145,7 @@ services:
       - 8080:8080
 
 
-  # docker-compose --profile scaled  up --scale geonetwork-replica=2 -d
+  # docker-compose --profile scaled up --scale geonetwork-replica=2 -d
   geonetwork-replica:
     profiles: [ "scaled" ]
     <<: *default-service-geonetwork
