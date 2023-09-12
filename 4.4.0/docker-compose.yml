@@ -20,7 +20,7 @@ x-geonetwork-environment:
     -Dgeonetwork.formatter.dir=/catalogue-data/data/formatter
     -Dgeonetwork.schema.dir=/opt/geonetwork/WEB-INF/data/config/schema_plugins
     -Dgeonetwork.indexConfig.dir=/opt/geonetwork/WEB-INF/data/config/index
-    -Dgeonetwork.htmlcache.dir=/tmp/geonetwork/htmlcache
+    -Dgeonetwork.htmlcache.dir=/opt/geonetwork/WEB-INF/data/resources/htmlcache
     -Des.host=elasticsearch
     -Des.protocol=http
     -Des.port=9200
@@ -43,7 +43,17 @@ x-service-geonetwork:
   &default-service-geonetwork
   image: geonetwork:4.4.0
   labels:
-    com.github.nginx-proxy.nginx-proxy.loadbalance: "hash $$remote_addr;"
+    - "traefik.enable=true"
+    - "traefik.http.routers.geonetwork.middlewares=root-redirect"
+    - "traefik.http.middlewares.root-redirect.replacepathregex.regex=^/$$"
+    - "traefik.http.middlewares.root-redirect.replacepathregex.replacement=/geonetwork/"
+    - "traefik.http.routers.geonetwork.rule=Host(`geonetwork.localhost`)"
+    - "traefik.http.routers.geonetwork.entrypoints=web"
+    - "traefik.http.services.geonetwork.loadbalancer.server.port=8080"
+    - "traefik.http.services.geonetwork.loadbalancer.sticky=true"
+    - "traefik.http.services.geonetwork.loadbalancer.sticky.cookie.name=gnstickycookie"
+    - "traefik.http.services.geonetwork.loadbalancer.sticky.cookie.secure=false"
+    - "traefik.http.services.geonetwork.loadbalancer.sticky.cookie.httpOnly=true"
   restart: always
   volumes:
     - geonetwork:/catalogue-data
@@ -59,8 +69,6 @@ volumes:
   esdata:
   pgdata:
   pglog:
-  nginxlog:
-  apachelog:
 
 
 networks:
@@ -69,52 +77,22 @@ networks:
 
 
 services:
-  www:
-    image: nginx
-    ports:
-      - 80:80
-    environment:
-      # Only used for / redirect to default webapp
-      - NGINX_PUBLIC_HOST=localhost
-      - NGINX_HOST=0.0.0.0
-      - NGINX_PORT=80
-      - WEBAPP_CONTEXT_PATH=/geonetwork
-
-    volumes:
-      - ./nginx:/etc/nginx/templates
-      - nginxlog:/var/log/nginx
-    depends_on:
-      - geonetwork
-    networks:
-      - gn-network
-
-  # docker-compose --profile scaled up www-lb
-  www-lb:
-    profiles: [ "scaled" ]
-    image: nginxproxy/nginx-proxy
+  traefik:
+    image: "traefik:v2.10"
+    container_name: "traefik"
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
     ports:
       - "80:80"
+      - "8000:8080"
     volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-    depends_on:
-      - geonetwork
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - gn-network
-
-#  www:
-#    image: httpd
-#    ports:
-#      - 81:80
-#    environment:
-#      - WEBAPP_CONTEXT_PATH=/geonetwork
-#    volumes:
-#      - ./apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
-#      - ./apache/gn-httpd.conf:/usr/local/apache2/conf/gn-httpd.conf
-#      - apachelog:/usr/local/apache2/logs
-#    depends_on:
-#      - geonetwork
-#    networks:
-#      - gn-network
 
 
   database:
@@ -143,7 +121,6 @@ services:
       HARVESTER_SCHEDULER_ENABLED: "true"
     ports:
       - 8080:8080
-
 
   # docker-compose --profile scaled up --scale geonetwork-replica=2 -d
   geonetwork-replica:

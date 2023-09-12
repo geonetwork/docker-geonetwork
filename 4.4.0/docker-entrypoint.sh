@@ -4,7 +4,6 @@ set -e
 export JAVA_OPTIONS="${JAVA_OPTS} ${GN_CONFIG_PROPERTIES}"
 
 GN_BASE_DIR=/opt/geonetwork
-ES_ACTUAL_HOST=${ES_HOST:-localhost}
 
 if ! command -v -- "$1" >/dev/null 2>&1 ; then
 	set -- java -jar "$JETTY_HOME/start.jar" "$@"
