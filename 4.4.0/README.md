@@ -15,7 +15,7 @@ cd docker-geonetwork/4.4.0
 docker-compose up
 ```
 
-3. Open http://localhost:8080/geonetwork/ in a browser
+3. Open http://geonetwork.localhost/geonetwork/ in a browser
 
 
 ## Build docker image
@@ -75,7 +75,7 @@ cp ../../core-geonetwork/web/target/geonetwork.war .
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
-5. Open http://localhost:8080/geonetwork/ in a browser
+5. Open http://geonetwork.localhost/geonetwork/ in a browser
 
 ## Running with a custom Database
 
@@ -172,7 +172,7 @@ eg. CAS configuration
 
 ## Running with a custom context path
 
-To run the application in a custom context path, for example in http://localhost:8080/catalogue instead of the default http://localhost:8080/geonetwork use the `WEBAPP_CONTEXT_PATH` environment variable:
+To run the application in a custom context path, for example in http://geonetwork.localhost/catalogue instead of the default http://geonetwork.localhost/geonetwork use the `WEBAPP_CONTEXT_PATH` environment variable:
 ```yaml
   environment:
     WEBAPP_CONTEXT_PATH: /catalogue
@@ -192,22 +192,11 @@ To configure the default application language and bypass browser language detect
 The clustering mode allows to start more than one GeoNetwork instance. 
 To enable it use the `scaled` profile. In this mode:
 * only one node will be in charge of the harvester scheduler and process the scheduled harvesting tasks
-* any node can take an harvesting task manually triggered from the harvesting console
+* any node can take a harvesting task manually triggered from the harvesting console
 * webserver is configured with sticky session (ie. a user stay on the same node) 
 
-
-Nginx default webserver is replaced by `nginxproxy/nginx-proxy`
-which updates its configuration when new GeoNetwork containers are created.
-
-
+To start new instances:
 ```shell script
-# Stop Nginx
-docker-compose kill www -d
-
-# Start load balancer
-docker-compose up www-lb -d
-
-# Start new instances
 docker-compose --profile scaled up --scale geonetwork-replica=2 -d
 ```
 
@@ -217,7 +206,6 @@ Known limitations:
   * log file, 
   * DOI configuration, 
   * proxy configuration (use Java environment variable instead of database configuration)
-
 
 
 ## Monitoring
