@@ -42,6 +42,11 @@ x-geonetwork-environment:
 x-service-geonetwork:
   &default-service-geonetwork
   image: geonetwork:4.4.0
+  healthcheck:
+    test: "curl http://localhost:8080/"
+    interval: 5s
+    timeout: 5s
+    retries: 30
   labels:
     - "traefik.enable=true"
     - "traefik.http.routers.geonetwork.middlewares=root-redirect"
@@ -58,8 +63,8 @@ x-service-geonetwork:
   volumes:
     - geonetwork:/catalogue-data
   depends_on:
-    - elasticsearch
-    - database
+    database:
+      condition: service_healthy
   networks:
     - gn-network
 
@@ -107,6 +112,11 @@ services:
                "-c", "log_file_mode=0644",
                "-c", "log_directory=/var/log/postgresql",
                "-c", "log_filename=postgresql.log" ]
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes:
       - pgdata:/var/lib/postgresql/data
       - pglog:/var/log/postgresql
@@ -137,22 +147,25 @@ services:
 
 
   ogc-api-records-service:
-    image: geonetwork/gn-cloud-ogc-api-records-service:4.2.5-0
+    image: geonetwork/gn-cloud-ogc-api-records-service:4.2.5-1
     environment:
       SPRING_PROFILES_ACTIVE: standalone
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/geonetwork
       SPRING_DATASOURCE_USERNAME: geonetwork
       SPRING_DATASOURCE_PASSWORD: geonetwork
-      GN_BASEURL: http://geonetwork:8080/geonetwork/api
-      GN_LEGACY_URL: http://geonetwork:8080/geonetwork
+      GN_BASEURL: http://geonetwork.localhost/geonetwork/api
+      GN_LEGACY_URL: http://geonetwork.localhost/geonetwork
       GN_INDEX_URL: http://elasticsearch:9200
       SERVER_FORWARDHEADERSSTRATEGY: FRAMEWORK
       JAVA_OPTS: -Dfile.encoding=UTF-8
-
+    healthcheck:
+      test: "timeout 10s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1"
+      interval: 10s
+      timeout: 2s
+      retries: 10
     depends_on:
-      - database
-      - elasticsearch
-      - geonetwork
+      geonetwork:
+         condition: service_healthy
     networks:
       - gn-network
 
@@ -168,6 +181,11 @@ services:
       nofile:
         soft: 65536
         hard: 65536
+    healthcheck:
+      test: "curl -s http://localhost:9200 >/dev/null || exit 1"
+      interval: 10s
+      timeout: 2s
+      retries: 10
     environment:
       ES_JAVA_OPTS: "-Xms1G -Xmx1G"
       discovery.type: single-node
@@ -185,5 +203,8 @@ services:
       SERVER_REWRITEBASEPATH: 'false'
       KIBANA_INDEX: .dashboards
       XPACK_MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED: 'true'
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
     networks:
       - gn-network
