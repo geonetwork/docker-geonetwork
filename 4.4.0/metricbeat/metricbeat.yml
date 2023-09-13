@@ -7,7 +7,7 @@ setup.template.settings:
   index.codec: best_compression
 
 setup.kibana:
-  host: "www:80"
+  host: "geonetwork:8080"
   path: "/geonetwork/dashboards"
   space.id: catalogue-monitor
   username: admin

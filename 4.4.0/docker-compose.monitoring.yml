@@ -1,6 +1,5 @@
 version: '3.8'
 
-
 services:
   metricbeat:
     image: docker.elastic.co/beats/metricbeat:7.17.10
@@ -22,10 +21,9 @@ services:
     volumes:
       - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
       - ./filebeat/modules.d:/usr/share/filebeat/modules.d
-      - ./filebeat/templates:/usr/share/filebeat/kibana/7/dashboard
+#      - ./filebeat/templates:/usr/share/filebeat/kibana/7/dashboard
       - pglog:/usr/share/filebeat/analyzedlogs/postgresql:ro
-      - nginxlog:/usr/share/filebeat/analyzedlogs/nginx:ro
-      - apachelog:/usr/share/filebeat/analyzedlogs/apache:ro
+      - traefiklog:/usr/share/filebeat/analyzedlogs/traefiklog:ro
     depends_on:
       - elasticsearch
       - kibana

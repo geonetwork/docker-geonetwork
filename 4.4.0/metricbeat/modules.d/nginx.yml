@@ -1,5 +1,0 @@
-- module: nginx
-  #metricsets:
-  #  - stubstatus
-  period: 10s
-  hosts: ["http://www:999"]
