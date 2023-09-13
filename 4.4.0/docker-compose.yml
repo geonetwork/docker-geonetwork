@@ -135,6 +135,7 @@ services:
     environment:
       << : *default-geonetwork-environment
       HARVESTER_SCHEDULER_ENABLED: "true"
+      HARVESTER_REFRESH_INTERVAL_MINUTES: 2
     ports:
       - 8080:8080
 
@@ -145,6 +146,7 @@ services:
     environment:
       << : *default-geonetwork-environment
       HARVESTER_SCHEDULER_ENABLED: "false"
+      HARVESTER_REFRESH_INTERVAL_MINUTES: 0
     deploy:
       mode: replicated
       replicas: 1

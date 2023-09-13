@@ -201,11 +201,12 @@ docker-compose --profile scaled up --scale geonetwork-replica=2 -d
 ```
 
 Known limitations:
-* Harvester schedule needs to be refreshed when database harvester configuration is modified (fix in progress) 
-* When saving application settings, some setting may require a reload of some modules 
+* Harvester / Scheduler needs to be refreshed when the database harvester configuration is modified (the harvesting node refresh the schedule every 2 minutes as a stopgap solution) 
+* Settings / When saving application settings, some modules need to be updated: 
   * log file, 
   * DOI configuration, 
   * proxy configuration (use Java environment variable instead of database configuration)
+* Thesaurus / Local thesaurus modified in one node are not updated on others.
 
 
 ## Monitoring
