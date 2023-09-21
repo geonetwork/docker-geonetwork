@@ -4,6 +4,7 @@ x-geonetwork-environment:
   &default-geonetwork-environment
   WEBAPP_CONTEXT_PATH: /geonetwork
   DATA_DIR: /catalogue-data
+  TZ: Europe/Amsterdam
 
   JAVA_OPTS: >-
     --add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED
@@ -20,6 +21,7 @@ x-geonetwork-environment:
     -Dgeonetwork.formatter.dir=/catalogue-data/data/formatter
     -Dgeonetwork.schema.dir=/opt/geonetwork/WEB-INF/data/config/schema_plugins
     -Dgeonetwork.indexConfig.dir=/opt/geonetwork/WEB-INF/data/config/index
+    -Dgeonetwork.schemapublication.dir=/opt/geonetwork/WEB-INF/data/resources/schemapublication
     -Dgeonetwork.htmlcache.dir=/opt/geonetwork/WEB-INF/data/resources/htmlcache
     -Des.host=elasticsearch
     -Des.protocol=http
