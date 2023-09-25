@@ -195,7 +195,7 @@ To enable it use the `scaled` profile. In this mode:
 * any node can take a harvesting task manually triggered from the harvesting console
 * webserver is configured with sticky session (ie. a user stay on the same node) 
 
-To start new instances:
+First, start the main composition which will start all services (including the main node). Then start new instances with:
 ```shell script
 docker-compose --profile scaled up --scale geonetwork-replica=2 -d
 ```
