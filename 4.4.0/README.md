@@ -201,7 +201,9 @@ docker-compose --profile scaled up --scale geonetwork-replica=2 -d
 ```
 
 Known limitations:
-* Harvester / Scheduler needs to be refreshed when the database harvester configuration is modified (the harvesting node refresh the schedule every 2 minutes as a stopgap solution) 
+* Harvester / Scheduler needs to be refreshed when the database harvester configuration is modified (the harvesting node refresh the schedule every 2 minutes as a stopgap solution)
+* Harvester / Replica can't access the main node harvester log files
+* Harvester / Running state is not visible on other nodes
 * Settings / When saving application settings, some modules need to be updated: 
   * log level configuration, 
   * DOI configuration, 
