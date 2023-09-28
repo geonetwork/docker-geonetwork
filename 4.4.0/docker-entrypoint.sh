@@ -11,7 +11,7 @@ fi
 
 if [[ "$1" = jetty.sh ]] || [[ $(expr "$*" : 'java .*/start\.jar.*$') != 0 ]]; then
     # Customize context path
-    if [ ! -f "{$JETTY_BASE}/webapps/geonetwork.xml" ]; then
+    if [ ! -f "${JETTY_BASE}/webapps/geonetwork.xml" ]; then
         echo "Using $WEBAPP_CONTEXT_PATH for deploying the application"
         cp /usr/local/share/geonetwork/geonetwork_context_template.xml "${JETTY_BASE}/webapps/geonetwork.xml"
         sed -i "s#GEONETWORK_CONTEXT_PATH#${WEBAPP_CONTEXT_PATH}#" "${JETTY_BASE}/webapps/geonetwork.xml"
