@@ -23,7 +23,7 @@ docker-compose up
 If not published, you can build the image locally using:
 
 ```shell script
-docker build .
+docker build . -t geonetwork:4.4.0
 ```
 
 ## Running with custom geonetwork.war
