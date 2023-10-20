@@ -189,7 +189,7 @@ To configure the default application language and bypass browser language detect
 
 ## Running behind a proxy
 
-If the catalogue needs to use proxy for HTTP calls, use Java environement variables:
+If the catalogue needs to use proxy for HTTP calls, use Java environment variables:
 
 ```
 -Dhttp.proxyHost=<proxyAddress>
