@@ -187,6 +187,22 @@ To configure the default application language and bypass browser language detect
 -Dlanguage.forceDefault=true
 ```
 
+## Running behind a proxy
+
+If the catalogue needs to use proxy for HTTP calls, use Java environement variables:
+
+```
+-Dhttp.proxyHost=<proxyAddress>
+-Dhttp.proxyPort=<proxyPort>
+-Dhttps.proxyHost=<proxyAddress>
+-Dhttps.proxyPort=<proxyPort>
+-Dhttp.nonProxyHosts=<nonProxyHosts>
+-Dhttp.proxyUser=<proxyUser>
+-Dhttp.proxyPassword=<proxyPassword>
+```
+
+
+
 ## Clustering (experimental)
 
 The clustering mode allows to start more than one GeoNetwork instance. 
