@@ -1,0 +1,54 @@
+FROM jetty:9-jdk11 as base
+
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends unzip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /opt/geonetwork \
+    && chown -R jetty:jetty /opt/geonetwork
+
+COPY geonetwork.war /tmp
+
+USER jetty
+RUN unzip /tmp/geonetwork.war -d /opt/geonetwork
+
+
+
+FROM jetty:9-jdk11 as final
+
+ENV GN_FILE geonetwork.war
+ENV GN_VERSION 4.4.0
+
+ENV DATA_DIR /catalogue-data
+ENV WEBAPP_CONTEXT_PATH /geonetwork
+
+
+# This variable can be used to define additional config options in the way of Java System properties
+# (e.g. "-Des.protocol=http -Des.port=9200 -Des.index.records=geo-records")
+ENV GN_CONFIG_PROPERTIES -Dgeonetwork.dir=${DATA_DIR} \
+        -Dgeonetwork.formatter.dir=${DATA_DIR}/data/formatter \
+        -Dgeonetwork.schema.dir=/opt/geonetwork/WEB-INF/data/config/schema_plugins \
+        -Dgeonetwork.indexConfig.dir=/opt/geonetwork/WEB-INF/data/config/index
+
+# JAVA_OPTS can be used to configue JVM specific options, like max memory, debugger port and method...
+ENV JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true \
+        -Xms512M -Xss512M -Xmx2G -XX:+UseConcMarkSweepGC
+
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends unzip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /catalogue-data \
+    && chown -R jetty:jetty /catalogue-data
+
+USER jetty
+
+COPY jetty/geonetwork_context_template.xml /usr/local/share/geonetwork/geonetwork_context_template.xml
+COPY --from=base /opt/geonetwork /opt/geonetwork
+
+COPY ./docker-entrypoint.sh /geonetwork-entrypoint.sh
+
+RUN java -jar /usr/local/jetty/start.jar --create-startd --add-to-start=http-forwarded
+
+ENTRYPOINT ["/geonetwork-entrypoint.sh"]
+CMD ["java","-jar","/usr/local/jetty/start.jar"]
