@@ -4,49 +4,47 @@
 
 1. Clone this repository
 
-```shell script
+```bash
 git clone https://github.com/geonetwork/docker-geonetwork.git
 cd docker-geonetwork/4.4.0
 ```
 
 2. Run the docker-composition from the current directory:
 
-```shell script
+```bash
 docker-compose up
 ```
 
 3. Open http://geonetwork.localhost/geonetwork/ in a browser
 
-
 ## Build docker image
 
 If not published, you can build the image locally using:
 
-```shell script
+```bash
 docker build . -t geonetwork:4.4.0
 ```
 
 ## Running with custom geonetwork.war
 
-
 This directory includes two Dockerfiles:
+
 * `Dockerfile` is canonical one used to generate the Docker Hub official 
 image. It downloads GeoNetwork 4.4.0-0 WAR file from sourceforge.  
 * `Dockerfile.local` needs a `geonetwork.war` file next to it to build
 the image.
 
-It also includes two docker-compose configuration files.
-* `docker-compose.yml` uses official GeoNetwork image from Docker Hub.
+It also includes two docker-compose configuration files.* `docker-compose.yml` uses official GeoNetwork image from Docker Hub.
+
 * `docker-compose.dev.yml` can be applied to override the image used in 
 `docker-compose.yml` and build the GeoNetwork image using `Dockerfile.local`.
-
 
 ### Pre-built image
 
 To use the pre-built image you can use the `docker-compose.yml` file provided 
 in this directory:
 
-```shell script
+```bash
 docker-compose up 
 ```
 
@@ -58,7 +56,7 @@ To be able to generate an elasticsearch-ready docker image, you will have:
 
 2. Clone this repository
 
-```shell script
+```bash
 git clone https://github.com/geonetwork/docker-geonetwork.git
 cd docker-geonetwork/4.4.0
 ```
@@ -71,7 +69,7 @@ cp ../../core-geonetwork/web/target/geonetwork.war .
 
 4. Run the docker-composition from the current directory:
 
-```shell script
+```bash
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
@@ -81,8 +79,7 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 
 See "Connecting to a postgres database" https://hub.docker.com/_/geonetwork
 
-
-```shell script
+```bash
 docker run --name geonetwork -d -p 8080:8080 \
            -e GEONETWORK_DB_TYPE=postgres \
            -e GEONETWORK_DB_HOST=my-db-host \
@@ -95,7 +92,7 @@ docker run --name geonetwork -d -p 8080:8080 \
 
 ## Running with remote Elasticsearch
 
-```shell script
+```bash
 docker run --name geonetwork -d -p 8080:8080 \
        -e "GN_CONFIG_PROPERTIES=-Des.host=elasticsearch \
           -Des.protocol=http \
@@ -116,13 +113,12 @@ discovery.seed_hosts: []
 
 Add the following options to `GN_CONFIG_PROPERTIES`:
 
-```
+```bash
 -Des.index.records=geo-records 
 -Des.index.features=geo-features 
 -Des.index.searchlogs=geo-searchlogs 
 -Dgeonetwork.ESFeaturesProxy.targetUri=http://elasticsearch:9200/geo-features/{_}
 ```
-
 
 ## Running with remote Elasticsearch with authentication
 
@@ -131,24 +127,21 @@ Add the `-Des.username=esUserName -Des.password=esPassword` options to `GN_CONFI
 If using the WFS features harvesting, add the
 `-Dgeonetwork.ESFeaturesProxy.username=esReadOnlyUsername -Dgeonetwork.ESFeaturesProxy.password=esPassword` options to `GN_CONFIG_PROPERTIES`.
 
-
 ## Running with remote Kibana
 
 Add the `-Dgeonetwork.HttpDashboardProxy.targetUri=http://kibana:5601` options to `GN_CONFIG_PROPERTIES`.
-
 
 ## Running with remote OGC API Records
 
 Add the `-Dgeonetwork.MicroServicesProxy.targetUri=http://ogc-api-records-service:8080` options to `GN_CONFIG_PROPERTIES`.
 
-
 ## Running with custom security mode
 
-Add the `-Dgeonetwork.security.type=` to set the authentication mode. See available security modes in https://github.com/geonetwork/core-geonetwork/blob/main/web/src/main/webapp/WEB-INF/config-security/config-security.xml#L43-L64 and configuration options in https://github.com/geonetwork/core-geonetwork/blob/main/web/src/main/webapp/WEB-INF/config-security/config-security.properties. See also https://geonetwork-opensource.org/manuals/4.0.x/en/administrator-guide/managing-users-and-groups/authentication-mode.html.
-
+Add the `-Dgeonetwork.security.type=` to set the authentication mode. See available security modes in <https://github.com/geonetwork/core-geonetwork/blob/main/web/src/main/webapp/WEB-INF/config-security/config-security.xml#L43-L64> and configuration options in <https://github.com/geonetwork/core-geonetwork/blob/main/web/src/main/webapp/WEB-INF/config-security/config-security.properties>. See also <https://geonetwork-opensource.org/manuals/4.0.x/en/administrator-guide/managing-users-and-groups/authentication-mode.html>.
 
 eg. LDAP configuration:
-```
+
+```bash
 -Dgeonetwork.security.type=ldap
 -Dldap.host=ldap
 -Dldap.port=389
@@ -162,17 +155,18 @@ eg. LDAP configuration:
 ```
 
 eg. CAS configuration
-```
+
+```bash
 -Dcas.baseURL=http://localhost:8080/cas
 -Dcas.login.url=http://localhost:8080/cas/login
 -Dcas.ticket.validator.url=http://cas:8080/cas
 -Dgeonetwork.https.url=http://localhost:8080/geonetwork
 ```
 
-
 ## Running with a custom context path
 
-To run the application in a custom context path, for example in http://geonetwork.localhost/catalogue instead of the default http://geonetwork.localhost/geonetwork use the `WEBAPP_CONTEXT_PATH` environment variable:
+To run the application in a custom context path, for example in <http://geonetwork.localhost/catalogue> instead of the default <http://geonetwork.localhost/geonetwork> use the `WEBAPP_CONTEXT_PATH` environment variable:
+
 ```yaml
   environment:
     WEBAPP_CONTEXT_PATH: /catalogue
@@ -180,9 +174,9 @@ To run the application in a custom context path, for example in http://geonetwor
 
 ## Configure the default language
 
-To configure the default application language and bypass browser language detection when redirecting from the base URL use: 
+To configure the default application language and bypass browser language detection when redirecting from the base URL use:
 
-```
+```bash
 -Dlanguage.default=fre
 -Dlanguage.forceDefault=true
 ```
@@ -191,7 +185,7 @@ To configure the default application language and bypass browser language detect
 
 If the catalogue needs to use proxy for HTTP calls, use Java environment variables:
 
-```
+```bash
 -Dhttp.proxyHost=<proxyAddress>
 -Dhttp.proxyPort=<proxyPort>
 -Dhttps.proxyHost=<proxyAddress>
@@ -201,36 +195,36 @@ If the catalogue needs to use proxy for HTTP calls, use Java environment variabl
 -Dhttp.proxyPassword=<proxyPassword>
 ```
 
-
-
 ## Clustering (experimental)
 
-The clustering mode allows to start more than one GeoNetwork instance. 
+The clustering mode allows to start more than one GeoNetwork instance.
 To enable it use the `scaled` profile. In this mode:
+
 * only one node will be in charge of the harvester scheduler and process the scheduled harvesting tasks
 * any node can take a harvesting task manually triggered from the harvesting console
-* webserver is configured with sticky session (ie. a user stay on the same node) 
+* webserver is configured with sticky session (ie. a user stay on the same node)
 
 First, start the main composition which will start all services (including the main node). Then start new instances with:
-```shell script
+
+```bash
 docker-compose --profile scaled up --scale geonetwork-replica=2 -d
 ```
 
 Known limitations:
-* Harvester / Scheduler needs to be refreshed when the database harvester configuration is modified (the harvesting node refresh the schedule every 2 minutes as a stopgap solution)
+
+* Harvester / Scheduler needs to be refreshed when the database harvester configuration is modified
+(the harvesting node refresh the schedule every 2 minutes as a stopgap solution)
 * Harvester / Replica can't access the main node harvester log files
 * Harvester / Running state is not visible on other nodes
-* Settings / When saving application settings, some modules need to be updated: 
-  * log level configuration, 
-  * DOI configuration, 
+* Settings / When saving application settings, some modules need to be updated:
+  * log level configuration,
+  * DOI configuration,
   * proxy configuration (use Java environment variable instead of database configuration)
 * Thesaurus / Local thesaurus modified in one node are not updated on others.
 
-
 ## Monitoring
 
-A composition is also available for monitoring metrics and logs 
-for the webserver and the database. 
+A composition is also available for monitoring metrics and logs for the webserver and the database.
 
 First start the composition without monitoring containers.
 In Kibana go to `Manage space` and create a `catalogue-monitor` space.
@@ -238,12 +232,12 @@ This space will be populated with default dashboards by metricbeat and filebeat.
 
 Once the space created, use the following to start metricbeat and filebeat:
 
-```shell script
+```bash
 docker-compose -f docker-compose.yml  -f docker-compose.monitoring.yml up --build 
 ```
 
 Metricbeat and filebeat needs to authenticate to push into Kibana (GeoNetwork is checking access). Adapt password
- if needed in configuration files for `setup.kibana.username` and `setup.kibana.password`. 
+ if needed in configuration files for `setup.kibana.username` and `setup.kibana.password`.
 
 Once started, sample dashboards analyzing the GeoNetwork API usage are available in `catalogue-log-dashboard.ndjson`.
 
