@@ -128,7 +128,7 @@ services:
 
 
   elasticsearch:
-    image: elasticsearch:7.11.1
+    image: elasticsearch:7.17.15
     ports:
       - 9200:9200
     ulimits:
@@ -147,7 +147,7 @@ services:
       - gn-network
 
   kibana:
-    image: kibana:7.11.1
+    image: kibana:7.17.15
     environment:
       SERVER_NAME: 'kibana'
       ELASTICSEARCH_URL: http://elasticsearch:9200/
