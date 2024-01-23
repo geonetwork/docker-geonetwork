@@ -1,0 +1,33 @@
+version: '3.1'
+
+
+services:
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:7.17.15
+    command: metricbeat -e -strict.perms=false
+    volumes:
+      - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+      - ./metricbeat/modules.d:/usr/share/metricbeat/modules.d
+      - ./metricbeat/templates:/usr/share/metricbeat/templates/7/dashboard
+    depends_on:
+      - elasticsearch
+      - kibana
+    networks:
+      - gn-network
+
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.17.15
+    command: filebeat -e -strict.perms=false
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./filebeat/modules.d:/usr/share/filebeat/modules.d
+      - ./filebeat/templates:/usr/share/filebeat/kibana/7/dashboard
+      - pglog:/usr/share/filebeat/analyzedlogs/postgresql:ro
+      - nginxlog:/usr/share/filebeat/analyzedlogs/nginx:ro
+      - apachelog:/usr/share/filebeat/analyzedlogs/apache:ro
+    depends_on:
+      - elasticsearch
+      - kibana
+    networks:
+      - gn-network
