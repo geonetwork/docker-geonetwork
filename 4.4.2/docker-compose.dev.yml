@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+  geonetwork:
+    build:
+        context: .
+        dockerfile: Dockerfile.local
