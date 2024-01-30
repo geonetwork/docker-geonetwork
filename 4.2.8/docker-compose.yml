@@ -106,7 +106,7 @@ services:
       - gn-network
 
   ogc-api-records-service:
-    image: geonetwork/gn-cloud-ogc-api-records-service:4.2.8-0
+    image: geonetwork/gn-cloud-ogc-api-records-service:4.2.7-0
     environment:
       SPRING_PROFILES_ACTIVE: standalone
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/geonetwork
