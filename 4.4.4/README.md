@@ -144,7 +144,7 @@ Add the `-Dgeonetwork.MicroServicesProxy.targetUri=http://ogc-api-records-servic
 
 ## Running with custom security mode
 
-Add the `-Dgeonetwork.security.type=` to set the authentication mode. See available security modes in https://github.com/geonetwork/core-geonetwork/blob/main/web/src/main/webapp/WEB-INF/config-security/config-security.xml#L43-L64 and configuration options in https://github.com/geonetwork/core-geonetwork/blob/main/web/src/main/webapp/WEB-INF/config-security/config-security.properties. See also https://geonetwork-opensource.org/manuals/4.0.x/en/administrator-guide/managing-users-and-groups/authentication-mode.html.
+Add the `-Dgeonetwork.security.type=` to set the authentication mode. See available security modes in https://github.com/geonetwork/core-geonetwork/blob/main/web/src/main/webapp/WEB-INF/config-security/config-security.xml#L43-L64 and configuration options in https://github.com/geonetwork/core-geonetwork/blob/main/web/src/main/webapp/WEB-INF/config-security/config-security.properties. See also [authentication mode documentation section](https://docs.geonetwork-opensource.org/4.4/administrator-guide/managing-users-and-groups/authentication-mode/).
 
 
 eg. LDAP configuration:
