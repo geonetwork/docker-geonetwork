@@ -1,5 +1,3 @@
-version: '3.8'
-
 x-geonetwork-environment:
   &default-geonetwork-environment
   WEBAPP_CONTEXT_PATH: /geonetwork
@@ -43,7 +41,7 @@ x-geonetwork-environment:
 
 x-service-geonetwork:
   &default-service-geonetwork
-#  image: geonetwork:4.4.4
+  image: geonetwork:4.4.4
   healthcheck:
     test: "curl http://localhost:8080/"
     interval: 5s
@@ -69,37 +67,6 @@ x-service-geonetwork:
       condition: service_healthy
   networks:
     - gn-network
-
-
-x-service-geonetwork-tomcat:
-  &default-service-geonetwork
-  image: tomcat:9.0
-  healthcheck:
-    test: "curl http://localhost:8080/"
-    interval: 5s
-    timeout: 5s
-    retries: 30
-  labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.geonetwork.middlewares=root-redirect"
-    - "traefik.http.middlewares.root-redirect.replacepathregex.regex=^/$$"
-    - "traefik.http.middlewares.root-redirect.replacepathregex.replacement=/geonetwork/"
-    - "traefik.http.routers.geonetwork.rule=Host(`geonetwork.localhost`)"
-    - "traefik.http.routers.geonetwork.entrypoints=web"
-    - "traefik.http.services.geonetwork.loadbalancer.server.port=8080"
-    - "traefik.http.services.geonetwork.loadbalancer.sticky=true"
-    - "traefik.http.services.geonetwork.loadbalancer.sticky.cookie.name=gnstickycookie"
-    - "traefik.http.services.geonetwork.loadbalancer.sticky.cookie.secure=false"
-    - "traefik.http.services.geonetwork.loadbalancer.sticky.cookie.httpOnly=true"
-  restart: always
-  volumes:
-    - geonetwork:/catalogue-data
-  depends_on:
-    database:
-      condition: service_healthy
-  networks:
-    - gn-network
-
 
 volumes:
   geonetwork:
@@ -253,7 +220,3 @@ services:
     networks:
       - gn-network
 
-  translation:
-    image: libretranslate/libretranslate
-    ports:
-      - 9090:5000
