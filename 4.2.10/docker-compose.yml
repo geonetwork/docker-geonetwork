@@ -1,0 +1,159 @@
+version: '3.1'
+
+volumes:
+  geonetwork:
+  esdata:
+  pgdata:
+  pglog:
+  nginxlog:
+  apachelog:
+
+
+networks:
+  gn-network:
+    driver: bridge
+
+
+services:
+  www:
+    image: nginx
+    ports:
+      - 80:80
+    environment:
+      # Only used for / redirect to default webapp
+      - NGINX_PUBLIC_HOST=195.201.225.214
+      #- NGINX_PUBLIC_HOST=apps.titellus.net
+      - NGINX_HOST=195.201.225.214
+      - NGINX_PORT=80
+    volumes:
+      - ./nginx:/etc/nginx/templates
+      - nginxlog:/var/log/nginx
+    depends_on:
+      - geonetwork
+    networks:
+      - gn-network
+
+#  www:
+#    image: httpd
+#    ports:
+#      - 81:80
+#    volumes:
+#      - ./apache/httpd.conf:/usr/local/apache2/conf/httpd.conf
+#      - ./apache/gn-httpd.conf:/usr/local/apache2/conf/gn-httpd.conf
+#      - apachelog:/usr/local/apache2/logs
+#    depends_on:
+#      - geonetwork
+#    networks:
+#      - gn-network
+
+
+  database:
+    image: postgis/postgis:11-2.5
+    environment:
+      POSTGRES_USER: geonetwork
+      POSTGRES_PASSWORD: geonetwork
+      POSTGRES_DB: geonetwork
+    command: [ "postgres",
+               "-c", "log_statement=all",
+               "-c", "logging_collector=true",
+               "-c", "log_file_mode=0644",
+               "-c", "log_directory=/var/log/postgresql",
+               "-c", "log_filename=postgresql.log" ]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - pglog:/var/log/postgresql
+    networks:
+      - gn-network
+
+
+  geonetwork:
+    image: geonetwork:4.2.10
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      DATA_DIR: /catalogue-data
+
+      JAVA_OPTS: >
+        -Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF
+        -Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true
+        -Xms512M -Xss512M -Xmx2G -XX:+UseConcMarkSweepGC
+        -Dgeonetwork.resources.dir=/catalogue-data/resources
+        -Dgeonetwork.data.dir=/catalogue-data
+        -Dgeonetwork.codeList.dir=/var/lib/jetty/webapps/geonetwork/WEB-INF/data/config/codelist
+        -Dgeonetwork.schema.dir=/var/lib/jetty/webapps/geonetwork/WEB-INF/data/config/schema_plugins
+
+      ES_HOST: elasticsearch
+      ES_PROTOCOL: http
+      ES_PORT: 9200
+
+      KB_URL: http://kibana:5601
+
+      GEONETWORK_DB_TYPE: postgres
+      GEONETWORK_DB_HOST: database
+      GEONETWORK_DB_PORT: 5432
+      GEONETWORK_DB_NAME: geonetwork
+      GEONETWORK_DB_USERNAME: geonetwork
+      GEONETWORK_DB_PASSWORD: geonetwork
+
+      GEONETWORK_MICROSERVICESPROXY_TARGETURI: http://ogc-api-records-service:8080
+    volumes:
+      - geonetwork:/catalogue-data
+    depends_on:
+      - elasticsearch
+      - database
+    networks:
+      - gn-network
+
+  ogc-api-records-service:
+    image: geonetwork/gn-cloud-ogc-api-records-service:4.2.9-0
+    environment:
+      SPRING_PROFILES_ACTIVE: standalone
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/geonetwork
+      SPRING_DATASOURCE_USERNAME: geonetwork
+      SPRING_DATASOURCE_PASSWORD: geonetwork
+      GN_BASEURL: http://geonetwork:8080/geonetwork/api
+      GN_LEGACY_URL: http://geonetwork:8080/geonetwork
+      GN_INDEX_URL: http://elasticsearch:9200
+      SERVER_FORWARDHEADERSSTRATEGY: FRAMEWORK
+      JAVA_OPTS: -Dfile.encoding=UTF-8
+
+    depends_on:
+      - database
+      - elasticsearch
+    networks:
+      - gn-network
+
+
+
+
+  elasticsearch:
+    image: elasticsearch:7.17.15
+    ports:
+      - 9200:9200
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    environment:
+      ES_JAVA_OPTS: "-Xms1G -Xmx1G"
+      discovery.type: single-node
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - gn-network
+
+  kibana:
+    image: kibana:7.17.15
+    environment:
+      SERVER_NAME: 'kibana'
+      ELASTICSEARCH_URL: http://elasticsearch:9200/
+      SERVER_BASEPATH: /geonetwork/dashboards
+      SERVER_REWRITEBASEPATH: 'false'
+      KIBANA_INDEX: .dashboards
+      XPACK_MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED: 'true'
+    networks:
+      - gn-network
