@@ -1,0 +1,229 @@
+x-geonetwork-environment:
+  &default-geonetwork-environment
+  WEBAPP_CONTEXT_PATH: /geonetwork
+  DATA_DIR: /catalogue-data
+  TZ: Europe/Amsterdam
+
+  JAVA_OPTS: >-
+    --add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED
+    -Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true
+    -Xms512M -Xss512M -Xmx2G -XX:+UseConcMarkSweepGC
+    -Djetty.httpConfig.requestHeaderSize=32768
+    -Dorg.eclipse.jetty.server.Request.maxFormContentSize=500000
+    -Dorg.eclipse.jetty.server.Request.maxFormKeys=4000
+  # For remote debug
+  # -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+
+  GN_CONFIG_PROPERTIES: >-
+    -Dgeonetwork.dir=/catalogue-data
+    -Dgeonetwork.formatter.dir=/catalogue-data/data/formatter
+    -Dgeonetwork.schema.dir=/opt/geonetwork/WEB-INF/data/config/schema_plugins
+    -Dgeonetwork.indexConfig.dir=/opt/geonetwork/WEB-INF/data/config/index
+    -Dgeonetwork.schemapublication.dir=/opt/geonetwork/WEB-INF/data/resources/schemapublication
+    -Dgeonetwork.htmlcache.dir=/opt/geonetwork/WEB-INF/data/resources/htmlcache
+    -Des.host=elasticsearch
+    -Des.protocol=http
+    -Des.port=9200
+    -Des.url=http://elasticsearch:9200
+    -Des.username=
+    -Des.password=
+    -Dgeonetwork.ESFeaturesProxy.targetUri=http://elasticsearch:9200/gn-features/{_}
+    -Dgeonetwork.HttpDashboardProxy.targetUri=http://kibana:5601
+    -Dgeonetwork.MicroServicesProxy.targetUri=http://ogc-api-records-service:8080
+
+  GEONETWORK_DB_TYPE: postgres
+  GEONETWORK_DB_HOST: database
+  GEONETWORK_DB_PORT: 5432
+  GEONETWORK_DB_NAME: geonetwork
+  GEONETWORK_DB_USERNAME: geonetwork
+  GEONETWORK_DB_PASSWORD: geonetwork
+  VIRTUAL_HOST: localhost
+
+x-service-geonetwork:
+  &default-service-geonetwork
+  image: geonetwork:4.4.5
+  healthcheck:
+    test: "curl http://localhost:8080/"
+    interval: 5s
+    timeout: 5s
+    retries: 30
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.geonetwork.middlewares=root-redirect"
+    - "traefik.http.middlewares.root-redirect.replacepathregex.regex=^/$$"
+    - "traefik.http.middlewares.root-redirect.replacepathregex.replacement=/geonetwork/"
+    - "traefik.http.routers.geonetwork.rule=Host(`geonetwork.localhost`)"
+    - "traefik.http.routers.geonetwork.entrypoints=web"
+    - "traefik.http.services.geonetwork.loadbalancer.server.port=8080"
+    - "traefik.http.services.geonetwork.loadbalancer.sticky=true"
+    - "traefik.http.services.geonetwork.loadbalancer.sticky.cookie.name=gnstickycookie"
+    - "traefik.http.services.geonetwork.loadbalancer.sticky.cookie.secure=false"
+    - "traefik.http.services.geonetwork.loadbalancer.sticky.cookie.httpOnly=true"
+  restart: always
+  volumes:
+    - geonetwork:/catalogue-data
+  depends_on:
+    database:
+      condition: service_healthy
+  networks:
+    - gn-network
+
+volumes:
+  geonetwork:
+  esdata:
+  pgdata:
+  pglog:
+  traefiklog:
+
+
+networks:
+  gn-network:
+    driver: bridge
+
+
+services:
+  traefik:
+    image: "traefik:v2.10"
+    container_name: "traefik"
+    command:
+#      - "--log.level=DEBUG"
+      - "--log.filePath=/logs/traefik.log"
+      - "--accesslog=true"
+      - "--accesslog.bufferingsize=50"
+      - "--accesslog.filePath=/logs/access.log"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8000:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - traefiklog:/logs
+    networks:
+      - gn-network
+
+
+  database:
+    image: postgis/postgis:11-2.5
+    environment:
+      POSTGRES_USER: geonetwork
+      POSTGRES_PASSWORD: geonetwork
+      POSTGRES_DB: geonetwork
+    command: [ "postgres",
+               "-c", "log_statement=all",
+               "-c", "logging_collector=true",
+               "-c", "log_file_mode=0644",
+               "-c", "log_directory=/var/log/postgresql",
+               "-c", "log_filename=postgresql.log" ]
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - pglog:/var/log/postgresql
+    networks:
+      - gn-network
+
+
+  geonetwork:
+    <<: *default-service-geonetwork
+    environment:
+      << : *default-geonetwork-environment
+      HARVESTER_SCHEDULER_ENABLED: "true"
+      HARVESTER_REFRESH_INTERVAL_MINUTES: 2
+    ports:
+      - 8080:8080
+
+
+  # docker-compose --profile scaled up --scale geonetwork-replica=2 -d
+  geonetwork-replica:
+    profiles: [ "scaled" ]
+    <<: *default-service-geonetwork
+    environment:
+      << : *default-geonetwork-environment
+      HARVESTER_SCHEDULER_ENABLED: "false"
+      HARVESTER_REFRESH_INTERVAL_MINUTES: 0
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - "8081-8082:8080"
+
+
+  ogc-api-records-service:
+    image: geonetwork/gn-cloud-ogc-api-records-service:4.4.3-0
+    environment:
+      SPRING_PROFILES_ACTIVE: standalone
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/geonetwork
+      SPRING_DATASOURCE_USERNAME: geonetwork
+      SPRING_DATASOURCE_PASSWORD: geonetwork
+      GN_BASEURL: http://geonetwork.localhost/geonetwork/api
+      GN_LEGACY_URL: http://geonetwork.localhost/geonetwork
+      GN_INDEX_URL: http://elasticsearch:9200
+      SERVER_FORWARDHEADERSSTRATEGY: FRAMEWORK
+      JAVA_OPTS: -Dfile.encoding=UTF-8
+    healthcheck:
+      test: "timeout 10s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1"
+      interval: 10s
+      timeout: 2s
+      retries: 10
+    depends_on:
+      geonetwork:
+         condition: service_healthy
+    networks:
+      - gn-network
+
+
+  elasticsearch:
+    image: elasticsearch:8.11.3
+    ports:
+      - 9200:9200
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    healthcheck:
+      test: "curl -s http://localhost:9200 >/dev/null || exit 1"
+      interval: 10s
+      timeout: 2s
+      retries: 10
+    environment:
+        - cluster.name=docker-cluster
+        - bootstrap.memory_lock=true
+        - discovery.type=single-node
+        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        - xpack.security.enabled=false
+        - xpack.security.enrollment.enabled=false
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - gn-network
+
+  kibana:
+    image: kibana:8.11.3
+    environment:
+      SERVER_NAME: 'kibana'
+      ELASTICSEARCH_URL: http://elasticsearch:9200/
+      SERVER_BASEPATH: /geonetwork/dashboards
+      SERVER_REWRITEBASEPATH: 'false'
+      XPACK_MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED: 'true'
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - gn-network
+
+
+#  translation:
+#    image: libretranslate/libretranslate
+#    ports:
+#      - 5000:5000
+#    networks:
+#      - gn-network
