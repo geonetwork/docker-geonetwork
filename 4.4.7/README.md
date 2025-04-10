@@ -1,4 +1,4 @@
-# Version 4.4.6
+# Version 4.4.7
 
 ## Running with integrated Elasticsearch
 
@@ -6,7 +6,7 @@
 
 ```shell script
 git clone https://github.com/geonetwork/docker-geonetwork.git
-cd docker-geonetwork/4.4.6
+cd docker-geonetwork/4.4.7
 ```
 
 2. Run the docker-composition from the current directory:
@@ -23,7 +23,7 @@ docker-compose up
 If not published, you can build the image locally using:
 
 ```shell script
-docker build . -t geonetwork:4.4.6
+docker build . -t geonetwork:4.4.7
 ```
 
 ## Running with custom geonetwork.war
@@ -31,7 +31,7 @@ docker build . -t geonetwork:4.4.6
 
 This directory includes two Dockerfiles:
 * `Dockerfile` is canonical one used to generate the Docker Hub official 
-image. It downloads GeoNetwork 4.4.6-0 WAR file from sourceforge.  
+image. It downloads GeoNetwork 4.4.7-0 WAR file from sourceforge.  
 * `Dockerfile.local` needs a `geonetwork.war` file next to it to build
 the image.
 
@@ -60,7 +60,7 @@ To be able to generate an elasticsearch-ready docker image, you will have:
 
 ```shell script
 git clone https://github.com/geonetwork/docker-geonetwork.git
-cd docker-geonetwork/4.4.6
+cd docker-geonetwork/4.4.7
 ```
 
 3. Get the generated webapp in the current directory, name it `geonetwork.war`
@@ -90,7 +90,7 @@ docker run --name geonetwork -d -p 8080:8080 \
            -e GEONETWORK_DB_USERNAME=postgres  \
            -e GEONETWORK_DB_PASSWORD=mysecretpassword \
            -e GEONETWORK_DB_NAME=mydbname \
-           geonetwork:4.4.6
+           geonetwork:4.4.7
 ```
 
 ## Running with remote Elasticsearch
@@ -102,7 +102,7 @@ docker run --name geonetwork -d -p 8080:8080 \
           -Des.port=9200 \
           -Des.url=http://elasticsearch:9200 \
           -Dgeonetwork.ESFeaturesProxy.targetUri=http://elasticsearch:9200/gn-features/{_} " \
-       geonetwork:4.4.6
+       geonetwork:4.4.7
 ```
 
 If you have error connecting to the remote Elasticsearch, check the configuration in `config/elasticsearch.yml`:
