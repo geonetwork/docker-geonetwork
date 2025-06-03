@@ -1,13 +1,14 @@
 FROM jetty:9-jdk8
 
-ENV DATA_DIR /catalogue-data
-ENV JAVA_OPTS -Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF \
-        -Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true \
+ENV DATA_DIR=/catalogue-data
+ENV JAVA_OPTS="-Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF \
+        -Djava.security.egd=file:/dev/./urandom \
+        -Djava.awt.headless=true \
         -Xms512M -Xss512M -Xmx2G -XX:+UseConcMarkSweepGC \
         -Dgeonetwork.resources.dir=${DATA_DIR}/resources \
         -Dgeonetwork.data.dir=${DATA_DIR} \
         -Dgeonetwork.codeList.dir=/var/lib/jetty/webapps/geonetwork/WEB-INF/data/config/codelist \
-        -Dgeonetwork.schema.dir=/var/lib/jetty/webapps/geonetwork/WEB-INF/data/config/schema_plugins 
+        -Dgeonetwork.schema.dir=/var/lib/jetty/webapps/geonetwork/WEB-INF/data/config/schema_plugins"
 
 USER root
 RUN apt-get -y update && \
@@ -21,9 +22,9 @@ RUN apt-get -y update && \
     chown -R jetty:jetty /var/lib/jetty/webapps/geonetwork
 
 USER jetty
-ENV GN_FILE geonetwork.war
-ENV GN_VERSION 4.2.13
-ENV GN_DOWNLOAD_MD5 2d75699a23192b4b1a81b90e346caea4
+ENV GN_FILE=geonetwork.war
+ENV GN_VERSION=4.2.13
+ENV GN_DOWNLOAD_MD5=2d75699a23192b4b1a81b90e346caea4
 
 RUN cd /var/lib/jetty/webapps/geonetwork/ && \
      curl -fSL -o geonetwork.war \
