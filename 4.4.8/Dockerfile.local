@@ -1,4 +1,4 @@
-FROM jetty:9-jdk11 AS base
+FROM jetty:9-jre11 AS base
 
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends unzip \
@@ -14,7 +14,7 @@ RUN unzip /tmp/geonetwork.war -d /opt/geonetwork
 
 
 
-FROM jetty:9-jdk11 AS final
+FROM jetty:9-jre11 AS final
 
 ENV GN_FILE=geonetwork.war
 ENV GN_VERSION=4.4.8

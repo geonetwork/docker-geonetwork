@@ -1,4 +1,4 @@
-FROM jetty:9-jdk11
+FROM jetty:9-jre11
 
 ENV DATA_DIR=/catalogue-data
 ENV WEBAPP_CONTEXT_PATH=/geonetwork
