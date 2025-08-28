@@ -1,21 +1,9 @@
-# Use the official GeoNetwork v4.4.8 image as the base
 FROM geonetwork:4.4.8
 
-ARG GEONETWORK_VERSION=4.4.8
-ARG PLUGIN_VERSION=${GEONETWORK_VERSION}
-ARG PLUGIN_DOWNLOAD_URL="https://sourceforge.net/projects/geonetwork/files/GeoNetwork_opensource/v${GEONETWORK_VERSION}/gn-datahub-integration-${PLUGIN_VERSION}-0.zip/download"
+ARG GN_VERSION=4.4.8
+ARG PLUGIN_DOWNLOAD_URL="https://sourceforge.net/projects/geonetwork/files/GeoNetwork_opensource/v${GN_VERSION}/gn-datahub-integration-${GN_VERSION}-0.zip/download"
 
-USER root
-
-RUN apt-get update && \
-    apt-get install -y \
-    wget \
-    unzip && \
-    rm -rf /var/lib/apt/lists/*
-
-USER jetty
-
-RUN wget -O /tmp/gn-plugin-datahub-integration.zip ${PLUGIN_DOWNLOAD_URL} \
+RUN curl -fSL -o /tmp/gn-plugin-datahub-integration.zip ${PLUGIN_DOWNLOAD_URL} \
     && unzip /tmp/gn-plugin-datahub-integration.zip -d /tmp/plugin \
-    && cp /tmp/plugin/gn-datahub-integration-${PLUGIN_VERSION}-0/lib/*.jar /opt/geonetwork/WEB-INF/lib/ \
+    && cp /tmp/plugin/gn-datahub-integration-${GN_VERSION}-0/lib/*.jar /opt/geonetwork/WEB-INF/lib/ \
     && rm -rf /tmp/plugin /tmp/gn-plugin-datahub-integration.zip

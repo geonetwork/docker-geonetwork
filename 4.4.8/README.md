@@ -26,6 +26,13 @@ If not published, you can build the image locally using:
 docker build . -t geonetwork:4.4.8
 ```
 
+## Build datahub docker image
+If not published, you can build the image locally using:
+
+```shell script
+docker build -t geonetwork-datahub:4.4.8 -f Dockerfile.datahub-plugin .
+```
+
 ## Running with custom geonetwork.war
 
 
