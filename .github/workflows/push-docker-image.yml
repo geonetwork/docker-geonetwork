@@ -30,7 +30,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         
       - name: Set version
         id: set-version
@@ -79,7 +79,7 @@ jobs:
 
       - name: Build and push standard Docker image
         id: build-push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./${{ env.VERSION }}
           file: ./${{ env.VERSION }}/Dockerfile
@@ -138,7 +138,7 @@ jobs:
           echo "tags=$TAGS" >> $GITHUB_OUTPUT
 
       - name: Build and push DataHub Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         if: env.DATAHUB_EXISTS == 'true'
         with:
           context: ./${{ env.VERSION }}
