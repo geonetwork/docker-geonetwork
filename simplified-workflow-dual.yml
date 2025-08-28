@@ -1,0 +1,147 @@
+name: GeoNetwork DataHub Plugin Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'GeoNetwork version (e.g., 4.4.8)'
+        required: true
+        type: string
+      use_latest:
+        description: 'Also tag this image as latest (true/false)'
+        default: 'false'
+        required: false
+        type: boolean
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: geonetwork
+
+jobs:
+  build-standard-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      version: ${{ env.VERSION }}
+      use_latest: ${{ env.USE_LATEST }}
+      built: ${{ steps.build-push.outputs.digest != '' }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set version
+        id: set-version
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          USE_LATEST="${{ github.event.inputs.use_latest }}"
+          
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "USE_LATEST=$USE_LATEST" >> $GITHUB_ENV
+
+      - name: Check if standard Dockerfile exists
+        id: check-standard-dockerfile
+        run: |
+          if [[ ! -d "$VERSION" ]]; then
+            echo "Error: Version directory $VERSION does not exist."
+            exit 1
+          fi
+          
+          if [[ ! -f "$VERSION/Dockerfile" ]]; then
+            echo "Error: Standard Dockerfile does not exist for version $VERSION."
+            exit 1
+          else
+            echo "Standard Dockerfile found for version $VERSION."
+          fi
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Prepare standard tags
+        id: prepare-standard-tags
+        run: |
+          TAGS="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}"
+          
+          if [[ "${{ env.USE_LATEST }}" == "true" ]]; then
+            TAGS="$TAGS,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          fi
+          
+          echo "tags=$TAGS" >> $GITHUB_OUTPUT
+
+      - name: Build and push standard Docker image
+        id: build-push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ env.VERSION }}
+          file: ./${{ env.VERSION }}/Dockerfile
+          push: true
+          tags: ${{ steps.prepare-standard-tags.outputs.tags }}
+
+  build-datahub-image:
+    needs: build-standard-image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    if: success() && needs.build-standard-image.outputs.built == 'true'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set version from previous job
+        run: |
+          echo "VERSION=${{ needs.build-standard-image.outputs.version }}" >> $GITHUB_ENV
+          echo "USE_LATEST=${{ needs.build-standard-image.outputs.use_latest }}" >> $GITHUB_ENV
+          
+      - name: Check if DataHub Dockerfile exists
+        id: check-datahub-dockerfile
+        run: |
+          if [[ -f "$VERSION/Dockerfile.datahub-plugin" ]]; then
+            echo "DATAHUB_EXISTS=true" >> $GITHUB_ENV
+            echo "DataHub Dockerfile found for version $VERSION."
+          else
+            echo "DATAHUB_EXISTS=false" >> $GITHUB_ENV
+            echo "DataHub Dockerfile not found for version $VERSION. Will skip DataHub build."
+            exit 0
+          fi
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Prepare DataHub tags
+        id: prepare-datahub-tags
+        if: env.DATAHUB_EXISTS == 'true'
+        run: |
+          TAGS="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-datahub:${{ env.VERSION }}"
+          
+          if [[ "${{ env.USE_LATEST }}" == "true" ]]; then
+            TAGS="$TAGS,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-datahub:latest"
+          fi
+          
+          echo "tags=$TAGS" >> $GITHUB_OUTPUT
+
+      - name: Build and push DataHub Docker image
+        uses: docker/build-push-action@v5
+        if: env.DATAHUB_EXISTS == 'true'
+        with:
+          context: ./${{ env.VERSION }}
+          file: ./${{ env.VERSION }}/Dockerfile.datahub-plugin
+          push: true
+          tags: ${{ steps.prepare-datahub-tags.outputs.tags }}
