@@ -2,8 +2,10 @@ FROM geonetwork:4.4.8
 
 ARG GN_VERSION=4.4.8
 ARG PLUGIN_DOWNLOAD_URL="https://sourceforge.net/projects/geonetwork/files/GeoNetwork_opensource/v${GN_VERSION}/gn-datahub-integration-${GN_VERSION}-0.zip/download"
+ARG PLUGIN_MD5="2a94adb2c674ada4dec048495163d22c"
 
 RUN curl -fSL -o /tmp/gn-plugin-datahub-integration.zip ${PLUGIN_DOWNLOAD_URL} \
+    && echo "${PLUGIN_MD5} /tmp/gn-plugin-datahub-integration.zip" | md5sum -c - \
     && unzip /tmp/gn-plugin-datahub-integration.zip -d /tmp/plugin \
     && cp /tmp/plugin/gn-datahub-integration-${GN_VERSION}-0/lib/*.jar /opt/geonetwork/WEB-INF/lib/ \
     && rm -rf /tmp/plugin /tmp/gn-plugin-datahub-integration.zip
