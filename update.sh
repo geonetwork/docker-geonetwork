@@ -3,6 +3,12 @@ set -eo pipefail
 
 cd "$(dirname "$BASH_SOURCE")"
 
+if sed --version 2>/dev/null | grep -q GNU; then
+	sedi() { sed -Ei "$@"; }
+else
+	sedi() { sed -Ei '' "$@"; }
+fi
+
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
 	versions=( */ )
@@ -19,28 +25,28 @@ for version in "${versions[@]}"; do
 	echo "MD5 for GeoNetwork ${version} is ${md5}"
 
 	echo "Updating ${version}/Dockerfile"
-	sed -ri \
+	sedi \
 		-e 's/^(ENV GN_VERSION) .*/\1 '"$version"'/' \
 		-e 's/^(ENV GN_DOWNLOAD_MD5) .*/\1 '"$md5"'/' \
 		"$version/Dockerfile"
 
 	if [[ -f "$version/postgres/Dockerfile" ]]; then 
 		echo "Updating ${version}/postgres/Dockerfile"
-		sed -ri \
+		sedi \
 			-e 's/^(FROM geonetwork):.*/\1:'"$version"'/' \
 			"$version/postgres/Dockerfile"
 	fi
 
 	if [[  -f "$version/docker-compose.yml" ]]; then
 		echo "Updating microservices reference"
-		sed -ri \
+		sedi \
 			-e "s#geonetwork/gn-cloud-ogc-api-records-service:.*#geonetwork/gn-cloud-ogc-api-records-service:${version}-0#" \
 			"$version/docker-compose.yml"
 	fi
 
 	if [[ -f "$version/README.md" ]]; then
 		echo "Updating ${version}/README.md"
-		sed -ri \
+		sedi \
 			-e 's/[0-9]+\.[0-9]+\.[0-9]+/'"$version"'/g' \
 			"$version/README.md"
 	fi
