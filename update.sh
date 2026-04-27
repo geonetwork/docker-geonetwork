@@ -34,4 +34,11 @@ for version in "${versions[@]}"; do
 			-e "s#geonetwork/gn-cloud-ogc-api-records-service:.*#geonetwork/gn-cloud-ogc-api-records-service:${version}-0#" \
 			"$version/docker-compose.yml"
 	fi
+
+	if [[ -f "$version/README.md" ]]; then
+		echo "Updating ${version}/README.md"
+		sed -ri \
+			-e 's/[0-9]+\.[0-9]+\.[0-9]+/'"$version"'/g' \
+			"$version/README.md"
+	fi
 done
