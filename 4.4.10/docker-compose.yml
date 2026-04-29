@@ -8,9 +8,6 @@ x-geonetwork-environment:
     --add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED
     -Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true
     -Xms512M -Xss512M -Xmx2G -XX:+UseConcMarkSweepGC
-    -Djetty.httpConfig.requestHeaderSize=32768
-    -Dorg.eclipse.jetty.server.Request.maxFormContentSize=500000
-    -Dorg.eclipse.jetty.server.Request.maxFormKeys=4000
   # For remote debug
   # -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
 
@@ -27,6 +24,7 @@ x-geonetwork-environment:
     -Des.url=http://elasticsearch:9200
     -Des.username=
     -Des.password=
+    -Dkb.url=http://kibana:5601
     -Dgeonetwork.ESFeaturesProxy.targetUri=http://elasticsearch:9200/gn-features/{_}
     -Dgeonetwork.HttpDashboardProxy.targetUri=http://kibana:5601
     -Dgeonetwork.MicroServicesProxy.targetUri=http://ogc-api-records-service:8080
@@ -38,6 +36,7 @@ x-geonetwork-environment:
   GEONETWORK_DB_USERNAME: geonetwork
   GEONETWORK_DB_PASSWORD: geonetwork
   VIRTUAL_HOST: localhost
+  REMOTE_IP_INTERNAL_PROXIES: '172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}'
 
 x-service-geonetwork:
   &default-service-geonetwork
@@ -55,7 +54,7 @@ x-service-geonetwork:
     - "traefik.http.routers.geonetwork.rule=Host(`geonetwork.localhost`)"
     - "traefik.http.routers.geonetwork.entrypoints=web"
     - "traefik.http.services.geonetwork.loadbalancer.server.port=8080"
-    - "traefik.http.services.geonetwork.loadbalancer.sticky=true"
+    - "traefik.http.services.geonetwork.loadbalancer.sticky.cookie=true"
     - "traefik.http.services.geonetwork.loadbalancer.sticky.cookie.name=gnstickycookie"
     - "traefik.http.services.geonetwork.loadbalancer.sticky.cookie.secure=false"
     - "traefik.http.services.geonetwork.loadbalancer.sticky.cookie.httpOnly=true"
@@ -83,7 +82,7 @@ networks:
 
 services:
   traefik:
-    image: "traefik:v2.10"
+    image: "traefik:v3.6"
     container_name: "traefik"
     command:
 #      - "--log.level=DEBUG"
@@ -179,7 +178,7 @@ services:
 
 
   elasticsearch:
-    image: elasticsearch:8.14.3
+    image: elasticsearch:8.19.13
     ports:
       - 9200:9200
     ulimits:
@@ -207,7 +206,7 @@ services:
       - gn-network
 
   kibana:
-    image: kibana:8.14.3
+    image: kibana:8.19.13
     environment:
       SERVER_NAME: 'kibana'
       ELASTICSEARCH_URL: http://elasticsearch:9200/

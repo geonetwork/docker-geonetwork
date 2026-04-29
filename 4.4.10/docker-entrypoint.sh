@@ -1,24 +1,28 @@
 #!/bin/bash
 set -e
 
-export JAVA_OPTIONS="${JAVA_OPTS} ${GN_CONFIG_PROPERTIES}"
+export CATALINA_OPTS="${GN_CONFIG_PROPERTIES}"
 
 GN_BASE_DIR=/opt/geonetwork
 
-if ! command -v -- "$1" >/dev/null 2>&1 ; then
-	set -- java -jar "$JETTY_HOME/start.jar" "$@"
-fi
-
-if [[ "$1" = jetty.sh ]] || [[ $(expr "$*" : 'java .*/start\.jar.*$') != 0 ]]; then
-    # Customize context path
-    if [ ! -f "{$JETTY_BASE}/webapps/geonetwork.xml" ]; then
-        echo "Using $WEBAPP_CONTEXT_PATH for deploying the application"
-        cp /usr/local/share/geonetwork/geonetwork_context_template.xml "${JETTY_BASE}/webapps/geonetwork.xml"
-        sed -i "s#GEONETWORK_CONTEXT_PATH#${WEBAPP_CONTEXT_PATH}#" "${JETTY_BASE}/webapps/geonetwork.xml"
+if [[ "$1" = "catalina.sh" ]]; then
+    if [[ -n "${REMOTE_IP_INTERNAL_PROXIES}" ]]; then
+        sed -i "s@REMOTE_IP_INTERNAL_PROXIES_VALUE@${REMOTE_IP_INTERNAL_PROXIES//\\/\\\\}@" "${CATALINA_HOME}/conf/server.xml"
+    else
+        sed -i 's/ internalProxies="REMOTE_IP_INTERNAL_PROXIES_VALUE"//' "${CATALINA_HOME}/conf/server.xml"
     fi
 
-    # Delegate on base image entrypoint to start jetty
-    exec /docker-entrypoint.sh "$@"
+    # Customize context path (Tomcat-style: file name = context path)
+    CONTEXT_NAME="${WEBAPP_CONTEXT_PATH#/}"
+    CONTEXT_FILE="${CATALINA_HOME}/conf/Catalina/localhost/${CONTEXT_NAME}.xml"
+    if [[ ! -f "${CONTEXT_FILE}" ]]; then
+        echo "Using ${WEBAPP_CONTEXT_PATH} for deploying the application"
+        mkdir -p "${CATALINA_HOME}/conf/Catalina/localhost"
+        cp /usr/local/share/geonetwork/geonetwork_context_template.xml "${CONTEXT_FILE}"
+        sed -i "s#GEONETWORK_CONTEXT_PATH#${WEBAPP_CONTEXT_PATH}#" "${CONTEXT_FILE}"
+    fi
+
+    exec "$@"
 else
     exec "$@"
 fi
