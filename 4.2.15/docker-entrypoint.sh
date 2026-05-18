@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-export CATALINA_OPTS="${JAVA_OPTIONS}"
-
 if [[ "$1" = "catalina.sh" ]]; then
     if [[ -n "${REMOTE_IP_INTERNAL_PROXIES}" ]]; then
         sed -i "s@REMOTE_IP_INTERNAL_PROXIES_VALUE@${REMOTE_IP_INTERNAL_PROXIES//\\/\\\\}@" "${CATALINA_HOME}/conf/server.xml"

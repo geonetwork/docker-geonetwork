@@ -38,7 +38,6 @@
                connectionTimeout="20000"
                redirectPort="8443"
                maxHttpHeaderSize="32768"
-               maxPostSize="500000"
                maxParameterCount="4000" />
 
     <Engine name="Catalina" defaultHost="localhost">

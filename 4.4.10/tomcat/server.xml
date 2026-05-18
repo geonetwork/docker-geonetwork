@@ -72,7 +72,6 @@
                connectionTimeout="20000"
                redirectPort="8443"
                maxHttpHeaderSize="32768"
-               maxPostSize="500000"
                maxParameterCount="4000" />
     <!-- A "Connector" using the shared thread pool-->
     <!--

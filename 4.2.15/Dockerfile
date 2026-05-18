@@ -9,24 +9,27 @@ ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom \
         -Dgeonetwork.codeList.dir=/usr/local/tomcat/webapps/geonetwork/WEB-INF/data/config/codelist \
         -Dgeonetwork.schema.dir=/usr/local/tomcat/webapps/geonetwork/WEB-INF/data/config/schema_plugins"
 
-RUN apt-get -y update && \
-    apt-get -y install --no-install-recommends \
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
         curl \
-        unzip && \
-    rm -rf /var/lib/apt/lists/* && \
-    mkdir -p ${DATA_DIR} && \
+        unzip \
+    ; \
+    rm -rf /var/lib/apt/lists/*; \
+    mkdir -p "${DATA_DIR}"; \
     mkdir -p /usr/local/tomcat/webapps/geonetwork
 
 ENV GN_FILE=geonetwork.war
 ENV GN_VERSION=4.2.15
 ENV GN_DOWNLOAD_MD5=79cd931ac7fc0be044ec1f2dd44f3f96
 
-RUN cd /usr/local/tomcat/webapps/geonetwork/ && \
-     curl -fSL -o geonetwork.war \
-     https://sourceforge.net/projects/geonetwork/files/GeoNetwork_opensource/v${GN_VERSION}/${GN_FILE}/download && \
-     echo "${GN_DOWNLOAD_MD5} *geonetwork.war" | md5sum -c && \
-     unzip -q geonetwork.war && \
-     rm geonetwork.war
+RUN set -eux; \
+    cd /usr/local/tomcat/webapps/geonetwork/; \
+    curl -fSL -o geonetwork.war \
+        "https://sourceforge.net/projects/geonetwork/files/GeoNetwork_opensource/v${GN_VERSION}/${GN_FILE}/download"; \
+    echo "${GN_DOWNLOAD_MD5} *geonetwork.war" | md5sum -c; \
+    unzip -q geonetwork.war; \
+    rm geonetwork.war
 
 COPY tomcat/server.xml /usr/local/tomcat/conf/server.xml
 COPY ./docker-entrypoint.sh /geonetwork-entrypoint.sh
