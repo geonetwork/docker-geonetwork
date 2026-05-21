@@ -1,0 +1,35 @@
+version: '3.1'
+
+volumes:
+  geonetwork:
+  keycloak:
+
+services:
+  
+  geonetwork:
+    image: geonetwork:3.11.SNAPSHOT
+    restart: always
+    ports:
+      - 443:8443
+    environment:
+      DATA_DIR: '/catalogue-data'
+      KEYCLOAK_AUTH_SERVER_URL: 'http://192.168.99.102:82/auth'
+      KEYCLOAK_REALM: 'myrealm'
+      KEYCLOAK_RESOURCE: 'myclient'
+      KEYCLOAK_SECRET: 'mysecret'
+      KEYCLOAK_DISABLE_TRUST_MANAGER: 'true'
+      JAVA_OPTS: >
+        -Dgeonetwork.data.dir=/catalogue-data
+    volumes:
+      - geonetwork:/catalogue-data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:12.0.1
+    restart: always
+    ports:
+      - 82:8080
+    environment:
+      KEYCLOAK_USER: 'admin'
+      KEYCLOAK_PASSWORD: 'admin'
+    volumes:
+      - keycloak:/data
