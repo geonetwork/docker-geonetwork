@@ -1,4 +1,4 @@
-FROM tomcat:9-jre8
+FROM tomcat:9-jre8-temurin-noble
 
 ENV DATA_DIR=/catalogue-data
 ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom \

@@ -1,4 +1,4 @@
-FROM tomcat:9-jre8
+FROM tomcat:9-jre8-temurin-noble
 
 ENV GN_FILE=geonetwork.war
 ENV GN_VERSION=4.2.16
