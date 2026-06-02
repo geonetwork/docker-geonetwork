@@ -13,6 +13,10 @@ if [[ "$1" = "catalina.sh" ]]; then
     fi
 
     # Customize context path (Tomcat-style: file name = context path)
+    if [[ ! "${WEBAPP_CONTEXT_PATH}" =~ ^/[a-zA-Z0-9_-]+$ ]]; then
+        echo "ERROR: WEBAPP_CONTEXT_PATH must start with / followed by letters, digits, hyphens, or underscores (got: ${WEBAPP_CONTEXT_PATH})" >&2
+        exit 2
+    fi
     CONTEXT_NAME="${WEBAPP_CONTEXT_PATH#/}"
     CONTEXT_FILE="${CATALINA_HOME}/conf/Catalina/localhost/${CONTEXT_NAME}.xml"
     if [[ ! -f "${CONTEXT_FILE}" ]]; then
