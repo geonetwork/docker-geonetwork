@@ -1,0 +1,4 @@
+- module: postgresql
+  log:
+    enabled: true
+    var.paths: ["/usr/share/filebeat/analyzedlogs/postgresql/*.log*"]
