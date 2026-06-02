@@ -1,4 +1,4 @@
-FROM tomcat:9-jre11 AS base
+FROM tomcat:9-jre11-temurin-noble AS base
 
 RUN apt-get update && apt-get install -y --no-install-recommends unzip \
     && apt-get clean \
@@ -11,7 +11,7 @@ RUN unzip -q /tmp/geonetwork.war -d /opt/geonetwork && rm /tmp/geonetwork.war
 
 
 
-FROM tomcat:9-jre11 AS final
+FROM tomcat:9-jre11-temurin-noble AS final
 
 ENV GN_FILE=geonetwork.war
 ENV GN_VERSION=4.4.11

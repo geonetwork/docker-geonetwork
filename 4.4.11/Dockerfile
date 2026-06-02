@@ -1,4 +1,4 @@
-FROM tomcat:9-jre11
+FROM tomcat:9-jre11-temurin-noble
 
 ENV DATA_DIR=/catalogue-data
 ENV WEBAPP_CONTEXT_PATH=/geonetwork
