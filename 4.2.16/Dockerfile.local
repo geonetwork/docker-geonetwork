@@ -11,16 +11,21 @@ ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true 
         -Dgeonetwork.codeList.dir=/usr/local/tomcat/webapps/geonetwork/WEB-INF/data/config/codelist \
         -Dgeonetwork.schema.dir=/usr/local/tomcat/webapps/geonetwork/WEB-INF/data/config/schema_plugins"
 
-RUN apt-get update && apt-get install -y --no-install-recommends unzip \
-    && rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /catalogue-data && \
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        unzip \
+    ; \
+    rm -rf /var/lib/apt/lists/*; \
+    mkdir -p "${DATA_DIR}"; \
     mkdir -p /usr/local/tomcat/webapps/geonetwork
 
 COPY geonetwork.war /usr/local/tomcat/webapps/geonetwork/geonetwork.war
 
-RUN cd /usr/local/tomcat/webapps/geonetwork/ && \
-     unzip -q geonetwork.war && \
-     rm geonetwork.war
+RUN set -eux; \
+    cd /usr/local/tomcat/webapps/geonetwork/; \
+    unzip -q geonetwork.war; \
+    rm geonetwork.war
 
 COPY ./docker-entrypoint.sh /geonetwork-entrypoint.sh
 ENTRYPOINT ["/geonetwork-entrypoint.sh"]

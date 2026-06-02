@@ -36,17 +36,17 @@ if [[ "$1" = "catalina.sh" ]]; then
     [[ -n "${ES_PASSWORD}" ]] && export GEONETWORK_ES_PASSWORD="${ES_PASSWORD}"
     [[ -n "${KB_URL}" ]]      && export GEONETWORK_KIBANA_URL="${KB_URL}"
 
-    # web.xml proxy servlets still hard-code localhost targets — rewrite them.
+    # web.xml proxy servlets still hard-code localhost targets -- rewrite them.
     if [[ "${ES_HOST}" != "localhost" ]]; then
-        sed -i "s#http://localhost:9200#${ES_PROTOCOL:=http}://${ES_HOST}:${ES_PORT:=9200}#g" "${GN_WEBAPPS_DIR}/WEB-INF/web.xml"
+        sed -i "s|http://localhost:9200|${ES_PROTOCOL:=http}://${ES_HOST}:${ES_PORT:=9200}|g" "${GN_WEBAPPS_DIR}/WEB-INF/web.xml"
     fi
 
     if [[ -n "${KB_URL}" ]] && [[ "${KB_URL}" != "http://localhost:5601" ]]; then
-        sed -i "s#http://localhost:5601#${KB_URL}#g" "${GN_WEBAPPS_DIR}/WEB-INF/web.xml"
+        sed -i "s|http://localhost:5601|${KB_URL//&/\\&}|g" "${GN_WEBAPPS_DIR}/WEB-INF/web.xml"
     fi
 
     if [[ -n "${ES_INDEX_RECORDS}" ]] && [[ "${ES_INDEX_RECORDS}" != "gn-records" ]]; then
-        sed -i "s#es.index.records=gn-records#es.index.records=${ES_INDEX_RECORDS}#" "${GN_WEBAPPS_DIR}/WEB-INF/config.properties"
+        sed -i "s|es.index.records=gn-records|es.index.records=${ES_INDEX_RECORDS}|" "${GN_WEBAPPS_DIR}/WEB-INF/config.properties"
     fi
 
     exec "$@"
