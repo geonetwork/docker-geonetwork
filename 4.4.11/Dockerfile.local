@@ -1,0 +1,46 @@
+FROM tomcat:9-jre11-temurin-noble AS base
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        unzip \
+    ; \
+    rm -rf /var/lib/apt/lists/*; \
+    mkdir -p /opt/geonetwork
+
+COPY geonetwork.war /tmp
+
+RUN set -eux; \
+    unzip -q /tmp/geonetwork.war -d /opt/geonetwork; \
+    rm /tmp/geonetwork.war
+
+
+
+FROM tomcat:9-jre11-temurin-noble AS final
+
+ENV GN_FILE=geonetwork.war
+ENV GN_VERSION=4.4.11
+
+ENV DATA_DIR=/catalogue-data
+ENV WEBAPP_CONTEXT_PATH=/geonetwork
+
+ENV GN_CONFIG_PROPERTIES="-Dgeonetwork.dir=${DATA_DIR} \
+        -Dgeonetwork.formatter.dir=${DATA_DIR}/data/formatter \
+        -Dgeonetwork.schema.dir=/opt/geonetwork/WEB-INF/data/config/schema_plugins \
+        -Dgeonetwork.indexConfig.dir=/opt/geonetwork/WEB-INF/data/config/index"
+
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true \
+        -Xms512M -Xss512M -Xmx2G -XX:+UseConcMarkSweepGC"
+
+RUN set -eux; \
+    mkdir -p "${DATA_DIR}"; \
+    mkdir -p /usr/local/tomcat/conf/Catalina/localhost
+
+COPY tomcat/geonetwork_context_template.xml /usr/local/share/geonetwork/geonetwork_context_template.xml
+COPY tomcat/server.xml /usr/local/tomcat/conf/server.xml
+COPY --from=base /opt/geonetwork /opt/geonetwork
+
+COPY ./docker-entrypoint.sh /geonetwork-entrypoint.sh
+
+ENTRYPOINT ["/geonetwork-entrypoint.sh"]
+CMD ["catalina.sh","run"]
