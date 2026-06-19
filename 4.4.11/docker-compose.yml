@@ -27,6 +27,7 @@ x-geonetwork-environment:
     -Dkb.url=http://kibana:5601
     -Dgeonetwork.ESFeaturesProxy.targetUri=http://elasticsearch:9200/gn-features/{_}
     -Dgeonetwork.HttpDashboardProxy.targetUri=http://kibana:5601
+    -Dgeonetwork.MicroServicesProxy.targetUri=http://ogc-api-records-service:8080/geonetwork/api
 
   GEONETWORK_DB_TYPE: postgres
   GEONETWORK_DB_HOST: database
@@ -151,6 +152,32 @@ services:
     ports:
       - "8081-8082:8080"
 
+
+  ogc-api-records-service:
+    image: ghcr.io/geonetwork/gn5-dev:ff06de8924f9eb9e51020863ebd4b0d8dd9d0ddc
+    hostname: ogc-api-records-service
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/geonetwork
+      SPRING_DATASOURCE_USERNAME: geonetwork
+      SPRING_DATASOURCE_PASSWORD: geonetwork
+      SPRING_LIQUIBASE_ENABLED: "false"
+      SPRING_CLOUD_CONFIG_ENABLED: "false"
+      GN5_BASE_URL: http://geonetwork.localhost/geonetwork
+      GEONETWORK_INDEX_URL: http://elasticsearch:9200
+      GEONETWORK_INDEX_INDEXPREFIX: gn-
+      GEONETWORK_OPENAPI-RECORDS_LINKS_BASE-PATH: /api
+      JAVA_OPTS: -Dfile.encoding=UTF-8
+    healthcheck:
+      test: "timeout 10s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1"
+      interval: 10s
+      timeout: 2s
+      retries: 10
+    depends_on:
+      geonetwork:
+         condition: service_healthy
+    networks:
+      - gn-network
 
 
   elasticsearch:
