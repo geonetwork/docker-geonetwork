@@ -27,7 +27,6 @@ x-geonetwork-environment:
     -Dkb.url=http://kibana:5601
     -Dgeonetwork.ESFeaturesProxy.targetUri=http://elasticsearch:9200/gn-features/{_}
     -Dgeonetwork.HttpDashboardProxy.targetUri=http://kibana:5601
-    -Dgeonetwork.MicroServicesProxy.targetUri=http://ogc-api-records-service:8080
 
   GEONETWORK_DB_TYPE: postgres
   GEONETWORK_DB_HOST: database
@@ -82,7 +81,7 @@ networks:
 
 services:
   traefik:
-    image: "traefik:v3.6"
+    image: "traefik:v3"
     container_name: "traefik"
     command:
 #      - "--log.level=DEBUG"
@@ -105,7 +104,7 @@ services:
 
 
   database:
-    image: postgis/postgis:17-3.5
+    image: postgres:17
     environment:
       POSTGRES_USER: geonetwork
       POSTGRES_PASSWORD: geonetwork
@@ -152,29 +151,6 @@ services:
     ports:
       - "8081-8082:8080"
 
-
-  ogc-api-records-service:
-    image: geonetwork/gn-cloud-ogc-api-records-service:4.4.11-0
-    environment:
-      SPRING_PROFILES_ACTIVE: standalone
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/geonetwork
-      SPRING_DATASOURCE_USERNAME: geonetwork
-      SPRING_DATASOURCE_PASSWORD: geonetwork
-      GN_BASEURL: http://geonetwork.localhost/geonetwork/api
-      GN_LEGACY_URL: http://geonetwork.localhost/geonetwork
-      GN_INDEX_URL: http://elasticsearch:9200
-      SERVER_FORWARDHEADERSSTRATEGY: FRAMEWORK
-      JAVA_OPTS: -Dfile.encoding=UTF-8
-    healthcheck:
-      test: "timeout 10s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1"
-      interval: 10s
-      timeout: 2s
-      retries: 10
-    depends_on:
-      geonetwork:
-         condition: service_healthy
-    networks:
-      - gn-network
 
 
   elasticsearch:
