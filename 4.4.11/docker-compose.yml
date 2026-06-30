@@ -82,7 +82,7 @@ networks:
 
 services:
   traefik:
-    image: "traefik:v3"
+    image: "traefik:v3.6"
     container_name: "traefik"
     command:
 #      - "--log.level=DEBUG"
@@ -105,7 +105,7 @@ services:
 
 
   database:
-    image: postgres:17
+    image: postgis/postgis:17-3.5
     environment:
       POSTGRES_USER: geonetwork
       POSTGRES_PASSWORD: geonetwork
