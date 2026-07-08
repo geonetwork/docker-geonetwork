@@ -1,0 +1,5 @@
+- module: apache
+  #metricsets:
+  #  - status
+  period: 10s
+  hosts: ["http://www2:998"]
