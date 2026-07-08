@@ -1,0 +1,26 @@
+FROM ubuntu:24.04
+
+RUN apt-get update && apt-get install -y \
+        bash \
+        git \
+        curl \
+        gawk \
+    && rm -rf /var/lib/apt/lists/* \
+    && git config --system --add safe.directory '*'
+
+ARG BASHBREW_VERSION=0.1.14
+RUN ARCH=$(dpkg --print-architecture) && \
+    case "$ARCH" in \
+        arm64) BASHBREW_ARCH="arm64v8" ;; \
+        armhf) BASHBREW_ARCH="arm32v7" ;; \
+        armel) BASHBREW_ARCH="arm32v6" ;; \
+        *)     BASHBREW_ARCH="$ARCH" ;; \
+    esac && \
+    curl -fsSL \
+      "https://github.com/docker-library/bashbrew/releases/download/v${BASHBREW_VERSION}/bashbrew-${BASHBREW_ARCH}" \
+      -o /usr/local/bin/bashbrew && \
+    chmod +x /usr/local/bin/bashbrew
+
+WORKDIR /work
+
+ENTRYPOINT ["bash", "generate-stackbrew-library.sh"]
