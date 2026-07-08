@@ -1,0 +1,5 @@
+services:
+  geonetwork:
+    build:
+        context: .
+        dockerfile: Dockerfile.local
