@@ -1,0 +1,10 @@
+- module: postgresql
+  #metricsets:
+  #  - database
+  #  - bgwriter
+  #  - activity
+  period: 10s
+  hosts: ["postgres://database:5432?sslmode=disable"]
+  username: geonetwork
+  password: geonetwork
+  database: geonetwork
