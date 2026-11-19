@@ -144,4 +144,14 @@ jobs:
 
           args=(--repo "$UPSTREAM" --head "${FORK%%/*}:$BRANCH" --base master --title "$TITLE" --body "$BODY")
           [ "$DRAFT" = "true" ] && args+=(--draft)
-          gh pr create "${args[@]}"
+          if ! gh pr create "${args[@]}"; then
+            # The branch is already pushed. A fine-grained token may be unable to
+            # open a PR on a repository outside its owner, so leave a link to do it by hand.
+            url="https://github.com/${UPSTREAM}/compare/master...${FORK%%/*}:${BRANCH}?expand=1"
+            {
+              echo "### Could not create the pull request"
+              echo "The branch \`${BRANCH}\` was pushed to \`${FORK}\`. Open the PR by hand: ${url}"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::gh pr create failed. Branch pushed, open the PR from: ${url}"
+            exit 1
+          fi

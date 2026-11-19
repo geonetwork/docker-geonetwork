@@ -28,8 +28,12 @@ To run it, go to the **Actions** tab, select **Open official-images PR** and cli
 The `draft` option is enabled by default, so you can review the PR before marking it ready.
 
 The workflow needs a repository secret named `OFFICIAL_IMAGES_TOKEN`: a fine-grained personal access
-token (or GitHub App token) with `contents: write` on `GeoCat/official-images` and
-`pull requests: write` on `docker-library/official-images`.
+token of an account with write access to `GeoCat/official-images`. Use `GeoCat` as the resource owner,
+select only the `GeoCat/official-images` repository and grant `Contents` and `Pull requests` read and write.
+
+A fine-grained token may not be allowed to open a PR on `docker-library/official-images`, which is outside
+its owner. If that happens the workflow still pushes the branch to the fork, fails, and writes a link in the
+job summary to open the PR by hand. A classic token with the `public_repo` scope avoids the limitation.
 
 If the manifest has no changes the workflow does nothing. If a PR for the same branch is already open,
 the workflow updates its branch instead of opening a second PR.
