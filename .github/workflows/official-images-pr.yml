@@ -1,7 +1,7 @@
 name: Open official-images PR
 
 # Regenerates geonetwork-library.txt from the current main and opens a PR
-# against docker-library/official-images from the GeoCat fork.
+# against docker-library/official-images from the geonetwork fork.
 # Run it by hand after the release PRs are merged (a push trigger would fire
 # once per merged PR of a stacked release).
 
@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 env:
-  FORK: GeoCat/official-images
+  FORK: geonetwork/official-images
   UPSTREAM: docker-library/official-images
   # Fine-grained PAT (or GitHub App token): contents write on the fork,
   # pull requests write on the upstream repository.

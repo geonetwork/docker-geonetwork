@@ -22,14 +22,14 @@ When releasing a new patch version, edit `generate-stackbrew-library.sh` first a
 
 Once the release PRs are merged to `main`, the **Open official-images PR** workflow
 (`.github/workflows/official-images-pr.yml`) generates the manifest and opens the PR
-against `docker-library/official-images` from the `GeoCat/official-images` fork.
+against `docker-library/official-images` from the `geonetwork/official-images` fork.
 
 To run it, go to the **Actions** tab, select **Open official-images PR** and click **Run workflow**.
 The `draft` option is enabled by default, so you can review the PR before marking it ready.
 
 The workflow needs a repository secret named `OFFICIAL_IMAGES_TOKEN`: a fine-grained personal access
-token of an account with write access to `GeoCat/official-images`. Use `GeoCat` as the resource owner,
-select only the `GeoCat/official-images` repository and grant `Contents` and `Pull requests` read and write.
+token of an account with write access to `geonetwork/official-images`. Use `geonetwork` as the resource owner,
+select only the `geonetwork/official-images` repository and grant `Contents` and `Pull requests` read and write.
 
 A fine-grained token may not be allowed to open a PR on `docker-library/official-images`, which is outside
 its owner. If that happens the workflow still pushes the branch to the fork, fails, and writes a link in the
