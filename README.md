@@ -25,7 +25,8 @@ Once the release PRs are merged to `main`, the **Open official-images PR** workf
 against `docker-library/official-images` from the `geonetwork/official-images` fork.
 
 To run it, go to the **Actions** tab, select **Open official-images PR** and click **Run workflow**.
-The `draft` option is enabled by default, so you can review the PR before marking it ready.
+The PR is opened ready for review, not as a draft: only the account that owns the token can mark a
+draft as ready, so a draft would need a login as that account.
 
 The workflow needs a repository secret named `OFFICIAL_IMAGES_TOKEN`: a **classic** personal access
 token with the `public_repo` scope, created by an account with write access to `geonetwork/official-images`
