@@ -27,13 +27,16 @@ against `docker-library/official-images` from the `geonetwork/official-images` f
 To run it, go to the **Actions** tab, select **Open official-images PR** and click **Run workflow**.
 The `draft` option is enabled by default, so you can review the PR before marking it ready.
 
-The workflow needs a repository secret named `OFFICIAL_IMAGES_TOKEN`: a fine-grained personal access
-token of an account with write access to `geonetwork/official-images`. Use `geonetwork` as the resource owner,
-select only the `geonetwork/official-images` repository and grant `Contents` and `Pull requests` read and write.
+The workflow needs a repository secret named `OFFICIAL_IMAGES_TOKEN`: a **classic** personal access
+token with the `public_repo` scope, created by an account with write access to `geonetwork/official-images`
+(currently the `geonetworkbuild` account). If the organization enforces SAML SSO, authorize the token for it.
 
-A fine-grained token may not be allowed to open a PR on `docker-library/official-images`, which is outside
-its owner. If that happens the workflow still pushes the branch to the fork, fails, and writes a link in the
-job summary to open the PR by hand. A classic token with the `public_repo` scope avoids the limitation.
+A fine-grained token is not enough. It can push the branch to the fork, but it cannot open a PR on
+`docker-library/official-images`, which is outside its owner (`createPullRequest` fails with
+"Resource not accessible by personal access token").
+
+If PR creation fails for any reason, the branch is already pushed to the fork. The workflow fails and writes a
+link in the job summary to open the PR by hand.
 
 If the manifest has no changes the workflow does nothing. If a PR for the same branch is already open,
 the workflow updates its branch instead of opening a second PR.
