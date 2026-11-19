@@ -32,10 +32,22 @@ jobs:
         with:
           fetch-depth: 0 # the generator reads git history for each GitCommit
 
-      - name: Generate geonetwork-library.txt
+      # bashbrew is a single prebuilt binary. The version is read from
+      # Dockerfile.stackbrew so there is one place to update. Installing it here
+      # avoids building the helper image, whose apt-get step needs the Ubuntu mirrors.
+      - name: Install bashbrew
         run: |
-          docker build -f Dockerfile.stackbrew -t geonetwork-stackbrew .
-          docker run --rm -v "$PWD:/work" geonetwork-stackbrew > "$RUNNER_TEMP/geonetwork-library.txt"
+          version=$(sed -n 's/^ARG BASHBREW_VERSION=//p' Dockerfile.stackbrew)
+          [ -n "$version" ] || { echo "BASHBREW_VERSION not found in Dockerfile.stackbrew"; exit 1; }
+          mkdir -p "$HOME/.local/bin"
+          curl --proto '=https' --proto-redir '=https' --tlsv1.2 -fsSL --retry 3 -o "$HOME/.local/bin/bashbrew" \
+            "https://github.com/docker-library/bashbrew/releases/download/v${version}/bashbrew-amd64"
+          chmod +x "$HOME/.local/bin/bashbrew"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/bashbrew" --version
+
+      - name: Generate geonetwork-library.txt
+        run: bash generate-stackbrew-library.sh > "$RUNNER_TEMP/geonetwork-library.txt"
 
       - name: Check out the official-images fork
         uses: actions/checkout@v4
