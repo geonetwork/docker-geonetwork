@@ -1,0 +1,147 @@
+name: Open official-images PR
+
+# Regenerates geonetwork-library.txt from the current main and opens a PR
+# against docker-library/official-images from the GeoCat fork.
+# Run it by hand after the release PRs are merged (a push trigger would fire
+# once per merged PR of a stacked release).
+
+on:
+  workflow_dispatch:
+    inputs:
+      draft:
+        description: Open the PR as a draft
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  FORK: GeoCat/official-images
+  UPSTREAM: docker-library/official-images
+  # Fine-grained PAT (or GitHub App token): contents write on the fork,
+  # pull requests write on the upstream repository.
+  GH_TOKEN: ${{ secrets.OFFICIAL_IMAGES_TOKEN }}
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out docker-geonetwork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the generator reads git history for each GitCommit
+
+      - name: Generate geonetwork-library.txt
+        run: |
+          docker build -f Dockerfile.stackbrew -t geonetwork-stackbrew .
+          docker run --rm -v "$PWD:/work" geonetwork-stackbrew > "$RUNNER_TEMP/geonetwork-library.txt"
+
+      - name: Check out the official-images fork
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.FORK }}
+          token: ${{ secrets.OFFICIAL_IMAGES_TOKEN }}
+          path: official-images
+          fetch-depth: 1
+
+      - name: Prepare branch
+        id: prep
+        working-directory: official-images
+        run: |
+          git remote add upstream "https://github.com/${UPSTREAM}.git"
+          git fetch --depth=1 upstream master
+          git checkout -q -B work FETCH_HEAD
+
+          # Plain x.y.z versions (first tag of each entry) already published
+          # upstream. Skips variants such as 3.12.12-postgres.
+          semver='^[0-9]+\.[0-9]+\.[0-9]+$'
+          mapfile -t old_versions < <(sed -n 's/^Tags: \([^,]*\).*/\1/p' library/geonetwork | grep -E "$semver" || true)
+
+          cp "$RUNNER_TEMP/geonetwork-library.txt" library/geonetwork
+
+          if git diff --quiet -- library/geonetwork; then
+            echo "library/geonetwork is already up to date, nothing to do."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # New versions = versions in the new manifest that were not upstream.
+          # Alias-only changes and rebuilds of an existing version are not new.
+          versions=()
+          body="Update GeoNetwork images:"$'\n'
+          while IFS= read -r line; do
+            version="${line%%,*}"
+            [[ "$version" =~ $semver ]] || continue
+            printf '%s\n' "${old_versions[@]}" | grep -qxF "$version" && continue
+            versions+=("$version")
+            aliases="${line#"$version"}"; aliases="${aliases#, }"
+            entry="- ${version}"
+            [ -n "$aliases" ] && entry+=" (also tagged as \`${aliases//, /\`, \`}\`)"
+            body+=$'\n'"$entry"
+          done < <(sed -n 's/^Tags: //p' library/geonetwork)
+
+          if [ "${#versions[@]}" -gt 0 ]; then
+            joined="${versions[0]}"
+            for ((i = 1; i < ${#versions[@]}; i++)); do
+              if ((i == ${#versions[@]} - 1)); then joined+=" and ${versions[i]}"; else joined+=", ${versions[i]}"; fi
+            done
+            title="Update GeoNetwork to ${joined}"
+            branch="update-geonetwork-$(IFS=-; echo "${versions[*]}")"
+          else
+            # No new version (rebuild or alias change): generic title, branch
+            # name tied to the manifest content so a rerun reuses it.
+            title="Update GeoNetwork"
+            branch="update-geonetwork-$(git hash-object library/geonetwork | cut -c1-7)"
+            # List the entries whose Tags line changed (any entry, including
+            # -postgres variants). Entries that only changed GitCommit or
+            # Directory have no changed Tags line and are covered by the diff.
+            body="Update GeoNetwork images."
+            changed_entries=""
+            while IFS= read -r line; do
+              version="${line%%,*}"
+              aliases="${line#"$version"}"; aliases="${aliases#, }"
+              if [ -n "$aliases" ]; then
+                changed_entries+=$'\n'"- ${version} (tags now: \`${aliases//, /\`, \`}\`)"
+              else
+                changed_entries+=$'\n'"- ${version} (no alias tags)"
+              fi
+            done < <(git diff -U0 -- library/geonetwork | sed -n 's/^+Tags: //p')
+            [ -z "$changed_entries" ] || body="Update GeoNetwork images:"$'\n'"${changed_entries}"
+          fi
+
+          {
+            echo "changed=true"
+            echo "title=${title}"
+            echo "branch=${branch}"
+            echo "body<<EOF"
+            echo "$body"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Open pull request
+        if: steps.prep.outputs.changed == 'true'
+        working-directory: official-images
+        env:
+          TITLE: ${{ steps.prep.outputs.title }}
+          BRANCH: ${{ steps.prep.outputs.branch }}
+          BODY: ${{ steps.prep.outputs.body }}
+          DRAFT: ${{ inputs.draft }}
+        run: |
+          existing=$(gh pr list --repo "$UPSTREAM" --head "${FORK%%/*}:$BRANCH" --state open --json url --jq '.[0].url // empty')
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add library/geonetwork
+          git commit -q -m "$TITLE"
+          # The branch is owned by this workflow, so a rerun may overwrite it.
+          git push --force origin "HEAD:refs/heads/$BRANCH"
+
+          if [ -n "$existing" ]; then
+            echo "PR already open, branch updated: $existing"
+            exit 0
+          fi
+
+          args=(--repo "$UPSTREAM" --head "${FORK%%/*}:$BRANCH" --base master --title "$TITLE" --body "$BODY")
+          [ "$DRAFT" = "true" ] && args+=(--draft)
+          gh pr create "${args[@]}"
