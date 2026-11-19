@@ -55,6 +55,8 @@ jobs:
       - name: Prepare branch
         id: prep
         working-directory: official-images
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           git remote add upstream "https://github.com/${UPSTREAM}.git"
           git fetch --depth=1 upstream master
@@ -122,6 +124,8 @@ jobs:
             echo "title=${title}"
             echo "branch=${branch}"
             echo "body<<EOF"
+            echo "Automated PR to update library/geonetwork, opened by the \"Open official-images PR\" workflow of https://github.com/${GITHUB_REPOSITORY} ([run](${RUN_URL}))."
+            echo
             echo "$body"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
