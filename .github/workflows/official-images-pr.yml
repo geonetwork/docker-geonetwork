@@ -40,7 +40,7 @@ jobs:
           version=$(sed -n 's/^ARG BASHBREW_VERSION=//p' Dockerfile.stackbrew)
           [ -n "$version" ] || { echo "BASHBREW_VERSION not found in Dockerfile.stackbrew"; exit 1; }
           mkdir -p "$HOME/.local/bin"
-          curl -fsSL --retry 3 -o "$HOME/.local/bin/bashbrew" \
+          curl --proto '=https' --proto-redir '=https' --tlsv1.2 -fsSL --retry 3 -o "$HOME/.local/bin/bashbrew" \
             "https://github.com/docker-library/bashbrew/releases/download/v${version}/bashbrew-amd64"
           chmod +x "$HOME/.local/bin/bashbrew"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
