@@ -127,8 +127,6 @@ jobs:
             echo "Automated PR to update library/geonetwork, opened by the \"Open official-images PR\" workflow of https://github.com/${GITHUB_REPOSITORY} ([run](${RUN_URL}))."
             echo
             echo "$body"
-            echo
-            echo "Please read https://github.com/docker-library/faq#an-images-source-changed-in-git-now-what before commenting on these pull requests."
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
