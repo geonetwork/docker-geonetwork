@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Check out docker-geonetwork
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # the generator reads git history for each GitCommit
 
@@ -50,7 +50,7 @@ jobs:
         run: bash generate-stackbrew-library.sh > "$RUNNER_TEMP/geonetwork-library.txt"
 
       - name: Check out the official-images fork
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: ${{ env.FORK }}
           token: ${{ secrets.OFFICIAL_IMAGES_TOKEN }}
