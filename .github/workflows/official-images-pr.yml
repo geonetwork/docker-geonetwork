@@ -19,8 +19,8 @@ permissions:
 env:
   FORK: geonetwork/official-images
   UPSTREAM: docker-library/official-images
-  # Fine-grained PAT (or GitHub App token): contents write on the fork,
-  # pull requests write on the upstream repository.
+  # Classic PAT with the public_repo scope (a fine-grained token cannot open
+  # a PR on the upstream repository). See the README.
   GH_TOKEN: ${{ secrets.OFFICIAL_IMAGES_TOKEN }}
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Check out docker-geonetwork
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # the generator reads git history for each GitCommit
 
@@ -50,7 +50,7 @@ jobs:
         run: bash generate-stackbrew-library.sh > "$RUNNER_TEMP/geonetwork-library.txt"
 
       - name: Check out the official-images fork
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: ${{ env.FORK }}
           token: ${{ secrets.OFFICIAL_IMAGES_TOKEN }}
@@ -157,8 +157,7 @@ jobs:
           args=(--repo "$UPSTREAM" --head "${FORK%%/*}:$BRANCH" --base master --title "$TITLE" --body "$BODY")
           [ "$DRAFT" = "true" ] && args+=(--draft)
           if ! gh pr create "${args[@]}"; then
-            # The branch is already pushed. A fine-grained token may be unable to
-            # open a PR on a repository outside its owner, so leave a link to do it by hand.
+            # The branch is already pushed, so leave a link to open the PR by hand.
             url="https://github.com/${UPSTREAM}/compare/master...${FORK%%/*}:${BRANCH}?expand=1"
             {
               echo "### Could not create the pull request"
