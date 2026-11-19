@@ -141,7 +141,8 @@ jobs:
           BODY: ${{ steps.prep.outputs.body }}
           DRAFT: ${{ inputs.draft }}
         run: |
-          existing=$(gh pr list --repo "$UPSTREAM" --head "${FORK%%/*}:$BRANCH" --state open --json url --jq '.[0].url // empty')
+          # `gh pr list --head` does not accept the owner:branch form, so use the REST filter.
+          existing=$(gh api "repos/${UPSTREAM}/pulls?head=${FORK%%/*}:${BRANCH}&state=open" --jq '.[0].html_url // empty')
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
