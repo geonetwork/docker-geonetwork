@@ -132,6 +132,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Open pull request
+        id: pr
         if: steps.prep.outputs.changed == 'true'
         working-directory: official-images
         env:
@@ -149,14 +150,25 @@ jobs:
           # The branch is owned by this workflow, so a rerun may overwrite it.
           git push --force origin "HEAD:refs/heads/$BRANCH"
 
+          # Show the PR link on the run page and expose it as a step output.
+          report() {
+            echo "pr_url=$2" >> "$GITHUB_OUTPUT"
+            echo "### $1" >> "$GITHUB_STEP_SUMMARY"
+            echo "[$TITLE]($2)" >> "$GITHUB_STEP_SUMMARY"
+          }
+
           if [ -n "$existing" ]; then
             echo "PR already open, branch updated: $existing"
+            report "Pull request already open, branch updated" "$existing"
             exit 0
           fi
 
           args=(--repo "$UPSTREAM" --head "${FORK%%/*}:$BRANCH" --base master --title "$TITLE" --body "$BODY")
           [ "$DRAFT" = "true" ] && args+=(--draft)
-          if ! gh pr create "${args[@]}"; then
+          if pr_url=$(gh pr create "${args[@]}"); then
+            echo "Created: $pr_url"
+            report "Pull request created" "$pr_url"
+          else
             # The branch is already pushed, so leave a link to open the PR by hand.
             url="https://github.com/${UPSTREAM}/compare/master...${FORK%%/*}:${BRANCH}?expand=1"
             {
